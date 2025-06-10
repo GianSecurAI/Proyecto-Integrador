@@ -117,26 +117,27 @@ CREATE TABLE Contacto (
     estado_respuesta VARCHAR(20) DEFAULT 'Pendiente',
     FOREIGN KEY (id_cliente) REFERENCES Usuario(id_usuario)
 );
+
+-- Inserción de categorías de productos
 INSERT INTO Categoria (nombre_categoria) VALUES
 ('Damas'),
 ('Caballeros'),
 ('Niños'),
 ('Unisex');
-INSERT INTO Producto (nombre_producto, descripcion, precio, stock, id_categoria)VALUES
 
-
+-- Inserción de productos con atributos completos
 INSERT INTO Producto (nombre_producto, codigo, marca, contenido, descripcion, precio, stock, id_categoria, estado) VALUES
 ('Perfume Dama Floral', 'P001', 'Dior', '100ml', 'Perfume floral para dama.', 120.00, 10, 1, TRUE),
 ('Colonia Caballero Sport', 'P002', 'Hugo Boss', '150ml', 'Colonia fresca para caballero.', 95.00, 15, 2, TRUE),
 ('Splash Niños Dulce', 'P003', 'Disney', '80ml', 'Splash suave para niños.', 60.00, 20, 3, TRUE),
 ('Fragancia Unisex Citrus', 'P004', 'CK', '120ml', 'Fragancia cítrica unisex.', 110.00, 8, 4, FALSE);
 
-
+-- Inserción de estados del catálogo
 INSERT INTO Estado (nombre_estado) VALUES
 ('Disponible'),
 ('No Disponible');
 
-
+-- Inserción de roles de usuario
 INSERT INTO Rol (nombre) VALUES
 ('Administrador'),
 ('Vendedor'),
