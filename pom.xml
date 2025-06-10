@@ -79,7 +79,7 @@
             <version>3.1.0</version>
         </dependency>
 		
-		<!-- 🚨 NUEVA DEPENDENCIA AÑADIDA -->
+		<!--  NUEVA DEPENDENCIA AÑADIDA -->
     	<!-- Dependencia para trabajar con archivos Excel (XLSX) usando Apache POI -->
     	<dependency>
         	<groupId>org.apache.poi</groupId>

@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import RegistrarUsuario from './main/java/com/example/Reyna/view/pages/admin/RegistrarUsuario.jsx';
 import Home from './main/java/com/example/Reyna/view/pages/home.jsx';
 import ProductsPage from './main/java/com/example/Reyna/view/pages/productos.jsx';
 import NosotrosPage from './main/java/com/example/Reyna/view/pages/nosotros.jsx';
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/admin/dashboard" element={<Dashboard />} /> {/* Ruta para el panel de administración */}
         <Route path="/admin/productos" element={<ProductosAdmin />} /> {/* Ruta para la administración de productos */}
         <Route path="/admin/clientes" element={<ClientesAdmin />} /> {/* Ruta para la administración de clientes */}
+        <Route path="/admin/registrar-usuario" element={<RegistrarUsuario />} /> {/* Ruta para registrar un nuevo usuario */}
       </Routes>
     </Router>
   );

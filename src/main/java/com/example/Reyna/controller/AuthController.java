@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     // Servicio que maneja la lógica de autenticación y registro
     private final AuthService authService;
+    
 
     // Recibe los datos de login en el cuerpo de la solicitud y los pasa al servicio
     @PostMapping(value = "login")

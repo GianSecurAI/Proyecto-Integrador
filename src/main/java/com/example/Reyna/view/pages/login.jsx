@@ -28,7 +28,7 @@ const Login = () => {
       const adminUser = {
         nombreCompleto: "Administrador",
         correo: "admin@gmail.com",
-        password: "admin",
+        contraseña: "admin123",
         telefono: "999999999",
         direccion: "Administración Central",
         estado: "activo",
@@ -37,13 +37,13 @@ const Login = () => {
       };
 
       try {
-        const response = await fetch('http://localhost:3001/auth/user/create', {
-          method: 'POST',
-          headers: {
+            const response = await fetch('http://localhost:3001/auth/register', {
+            method: 'POST',
+            headers: {
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(adminUser)
-        });
+            },
+            body: JSON.stringify(adminUser)
+          });
 
         if (response.ok) {
           console.log('Usuario administrador creado con éxito');
@@ -59,60 +59,62 @@ const Login = () => {
   }, [navigate]);
 
   const handleLoginSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const formData = new URLSearchParams();
-    formData.append("correo", loginEmail);
-    formData.append("password", loginPassword);
+  try {
+    const response = await fetch('http://localhost:3001/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        correo: loginEmail,
+        contraseña: loginPassword
+      })
+    });
 
+    let data;
     try {
-      const response = await fetch('http://localhost:3001/auth/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('user', JSON.stringify(data.data));
-        localStorage.setItem('token', data.token);
-        alert(data.message);
-        
-        // Redirigir según el rol del usuario
-        if (data.data.role === "ADMIN") {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/');
-        }
-        
-        window.location.reload();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-      alert('Error al conectar con el servidor');
+      data = await response.json();
+    } catch {
+      data = { message: 'Error inesperado del servidor' };
     }
-  };
+
+    if (response.ok) {
+      localStorage.setItem('user', JSON.stringify(data.data));
+      localStorage.setItem('token', data.token);
+      alert(data.message);
+
+      if (data.data.role === "ADMIN") {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
+      window.location.reload();
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error('Error de red:', error);
+    alert('Error al conectar con el servidor');
+  }
+};
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     const user = {
       nombreCompleto: registerName,
       correo: registerEmail,
-      password: registerPassword,
+      contraseña: registerPassword,
       telefono: registerPhone,
       direccion: registerAddress,
       estado: "activo",
-      id_rol: 2,
-      role: "USER"
+      id_rol: 3,
+      role: "CLIENTE"
     };
 
     try {
-      const response = await fetch('http://localhost:8090/auth/user/create', {
+      const response = await fetch('http://localhost:3001/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

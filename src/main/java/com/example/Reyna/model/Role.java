@@ -1,6 +1,5 @@
 package com.example.Reyna.model;
 
 public enum Role {
-    ADMIN,
-    USER  
+    ADMINISTRADOR, VENDEDOR, CLIENTE
 }

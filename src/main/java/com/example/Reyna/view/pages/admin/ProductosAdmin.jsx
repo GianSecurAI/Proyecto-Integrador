@@ -9,13 +9,7 @@ import { saveAs } from 'file-saver';
 const ProductosAdmin = () => {
   const navigate = useNavigate();
   const [productos, setProductos] = useState([
-    { id: 'P001', nombre: 'Set Ccori Rosé: Parfum + Loción Perfumada', categoria: 'Perfumes', precio: 119 },
-    { id: 'P002', nombre: 'Cielo en Rosa Eau de Parfum', categoria: 'Perfumes', precio: 113 },
-    { id: 'P003', nombre: 'Set Sauvage Dior: Parfum + Estuche Elegante', categoria: 'Perfumes', precio: 105 },
-    { id: 'P004', nombre: 'Bombshell Seduction Eau de Parfum', categoria: 'Perfumes', precio: 180 },
-    { id: 'P005', nombre: 'Una Instinct Eau de Parfum', categoria: 'Perfumes', precio: 165 },
-    { id: 'P006', nombre: 'Fragancia Intensa para Hombre', categoria: 'Perfumes', precio: 150 }
-  ]);
+]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('Todos');
   const [productosFiltrados, setProductosFiltrados] = useState(productos);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -40,18 +34,13 @@ const ProductosAdmin = () => {
   const marcas = ['Dior', 'Carolina Herrera', 'Lancôme', 'MAC', 'L\'Oreal', 'Maybelline'];
   const opcionesSexo = ['Masculino', 'Femenino', 'Unisex'];
 
-  useEffect(() => {
-    if (categoriaSeleccionada === 'Todos') {
-      setProductosFiltrados(productos);
-    } else {
-      setProductosFiltrados(productos.filter(p => p.categoria === categoriaSeleccionada));
-    }
-  }, [categoriaSeleccionada, productos]);
+useEffect(() => {
+  cargarProductos();
+}, []);
 const cargarProductos = async () => {
   try {
     const response = await fetch('http://localhost:3001/api/productos');
     if (!response.ok) {
-      // Aquí puedes mostrar un mensaje personalizado según el código de error
       if (response.status === 403) {
         throw new Error('No tienes permisos para ver los productos (403 Forbidden)');
       } else if (response.status === 404) {
@@ -61,11 +50,17 @@ const cargarProductos = async () => {
       }
     }
     const data = await response.json();
-    setProductos(data);
+    // Mapea los campos del backend a los del frontend
+    const productosMapeados = data.map(p => ({
+      id: p.id_producto, // Ajusta según tu backend
+      nombre: p.nombre_producto,
+      categoria: p.categoria ? p.categoria.nombre_categoria : '', // Ajusta según tu backend
+      precio: p.precio
+    }));
+    setProductos(productosMapeados);
   } catch (error) {
-    // Aquí puedes mostrar el error en la UI o en consola
     console.error('Error al cargar productos:', error.message);
-    alert(error.message); // Opcional: muestra el error al usuario
+    alert(error.message);
   }
 };
   const handleInputChange = (e) => {
@@ -133,14 +128,15 @@ const handleGuardarProducto = async () => {
     };
 
     try {
-      const token = localStorage.getItem('token'); // <-- agrega esta línea antes del fetch
+      const token = localStorage.getItem('token');// <-- agrega esta línea antes del fetch
+      console.log('TOKEN ENVIADO:', token);
       const response = await fetch('http://localhost:3001/api/productos', {
        method: 'POST',
        headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}` // <-- agrega esta línea
   },
-  body: JSON.stringify(nuevoProducto)
+  body: JSON.stringify(nuevoProductoFormateado)
 });
       if (!response.ok) throw new Error('Error al guardar el producto');
       // Recarga productos desde el backend

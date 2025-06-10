@@ -81,8 +81,24 @@ const Navbar = () => {
             <li className="nav-item"><Link className="nav-link active" to="/">INICIO</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/productos">PRODUCTOS</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/nosotros">NOSOTROS</Link></li>
-            <li className="nav-item"><Link className="nav-link" to="/contacto">CONTACTO</Link></li>          </ul>
-          <div className="d-flex align-items-center">
+            <li className="nav-item"><Link className="nav-link" to="/contacto">CONTACTO</Link></li>          
+             {/* Solo para ADMINISTRADOR */}
+             {user && user.role === "ADMINISTRADOR" && (
+            <li className="nav-item"><Link className="nav-link" to="/admin/registrar-usuario">REGISTRAR USUARIO</Link></li>
+            )}  
+
+            {/* Solo para ADMINISTRADOR y VENDEDOR */}
+            {user && (user.role === "ADMINISTRADOR" || user.role === "VENDEDOR") && (
+            <li className="nav-item"><Link className="nav-link" to="/ventas">VENTAS</Link></li>
+            )}
+
+            {/* Solo para CLIENTE */}
+            {user && user.role === "CLIENTE" && (
+            <li className="nav-item"><Link className="nav-link" to="/carrito">CARRITO</Link></li>
+            )}
+            </ul>
+
+           <div className="d-flex align-items-center">
             {/* Icono del carrito */}
             <span 
               className="me-3 text-decoration-none navbar-link cart-icon-container" 
@@ -159,6 +175,12 @@ const Navbar = () => {
               )}
               {user && showDropdown && (
                 <div className="user-dropdown-menu" style={{ position: 'absolute', right: 0, top: '100%', background: '#fff', border: '1px solid #ddd', borderRadius: 4, minWidth: 120, zIndex: 1000 }}>
+                   {/* Solo para ADMINISTRADOR */}
+                   {user.role === "ADMINISTRADOR" && (
+                   <Link to="/admin/registrar-usuario" className="dropdown-item w-100 text-start" style={{ padding: '8px 16px' }}>
+                  Registrar Usuario
+                  </Link>
+                  )}
                   <button className="dropdown-item w-100 text-start" onClick={handleLogout} style={{ background: 'none', border: 'none', padding: '8px 16px', cursor: 'pointer' }}>
                     Salir
                   </button>

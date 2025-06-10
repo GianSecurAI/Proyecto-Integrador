@@ -27,6 +27,9 @@ CREATE TABLE Categoria (
 CREATE TABLE Producto (
     id_producto Bigserial PRIMARY KEY,
     nombre_producto VARCHAR(100) NOT NULL,
+    codigo VARCHAR(50) NOT NULL UNIQUE,
+    marca VARCHAR(100),
+    contenido VARCHAR(100),
     descripcion TEXT,
     precio DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL,
@@ -98,6 +101,11 @@ CREATE TABLE Detalle_Venta (
     FOREIGN KEY (id_venta) REFERENCES Venta(id_venta),
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
 );
+-- Tabla de estados (opcional, si quieres manejarlo como catálogo)
+CREATE TABLE Estado (
+    id_estado SERIAL PRIMARY KEY,
+    nombre_estado VARCHAR(50) NOT NULL
+);
 
 -- Contactos o reclamos de clientes
 CREATE TABLE Contacto (
@@ -110,15 +118,26 @@ CREATE TABLE Contacto (
     FOREIGN KEY (id_cliente) REFERENCES Usuario(id_usuario)
 );
 INSERT INTO Categoria (nombre_categoria) VALUES
-('Perfumes'),
-('Maquillaje'),
-('Cremas'),
-('Joyas');
-INSERT INTO Producto (nombre_producto, descripcion, precio, stock, id_categoria)
-VALUES
-('Set Ccori Rosé: Parfum + Loción Perfumada', 'Set de perfume y loción con aroma floral.', 119.00, 10, 1),
-('Cielo en Rosa Eau de Parfum', 'Fragancia femenina con notas frescas y florales.', 113.00, 15, 1),
-('Set Sauvage Dior: Parfum + Estuche Elegante', 'Set masculino con estuche de regalo.', 105.00, 8, 1),
-('Bombshell Seduction Eau de Parfum', 'Perfume seductor y elegante.', 180.00, 5, 1),
-('Una Instinct Eau de Parfum', 'Fragancia intensa y duradera.', 165.00, 12, 1),
-('Fragancia Intensa para Hombre', 'Perfume masculino de larga duración.', 150.00, 20, 1);
+('Damas'),
+('Caballeros'),
+('Niños'),
+('Unisex');
+INSERT INTO Producto (nombre_producto, descripcion, precio, stock, id_categoria)VALUES
+
+
+INSERT INTO Producto (nombre_producto, codigo, marca, contenido, descripcion, precio, stock, id_categoria, estado) VALUES
+('Perfume Dama Floral', 'P001', 'Dior', '100ml', 'Perfume floral para dama.', 120.00, 10, 1, TRUE),
+('Colonia Caballero Sport', 'P002', 'Hugo Boss', '150ml', 'Colonia fresca para caballero.', 95.00, 15, 2, TRUE),
+('Splash Niños Dulce', 'P003', 'Disney', '80ml', 'Splash suave para niños.', 60.00, 20, 3, TRUE),
+('Fragancia Unisex Citrus', 'P004', 'CK', '120ml', 'Fragancia cítrica unisex.', 110.00, 8, 4, FALSE);
+
+
+INSERT INTO Estado (nombre_estado) VALUES
+('Disponible'),
+('No Disponible');
+
+
+INSERT INTO Rol (nombre) VALUES
+('Administrador'),
+('Vendedor'),
+('Cliente');

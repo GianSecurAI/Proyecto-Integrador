@@ -35,12 +35,23 @@ import org.springframework.security.authentication.AuthenticationProvider;
                     csrf
                     .disable())
                 .authorizeHttpRequests(authRequest ->
-                  authRequest
-                    .requestMatchers("/auth/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll() // <-- AGREGA ESTA LÍNEA
-                    
-                    .anyRequest().authenticated()
-                    )
+                authRequest
+                // Público: autenticación y ver productos
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/admin/**").hasAuthority("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                // Solo ADMINISTRADOR puede editar/eliminar productos y ver ventas
+                .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAuthority("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasAuthority("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.GET, "/api/ventas/**").hasAuthority("ADMINISTRADOR")
+                // ADMINISTRADOR y VENDEDOR pueden crear productos y ventas
+                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
+                .requestMatchers(HttpMethod.POST, "/api/ventas/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
+                // CLIENTE solo puede comprar (ajusta el endpoint si es diferente)
+                .requestMatchers(HttpMethod.POST, "/api/compras/**").hasAuthority("CLIENTE")
+                // Todo lo demás requiere autenticación
+                .anyRequest().authenticated()
+)
                 .sessionManagement(sessionManager->
                     sessionManager 
                       .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

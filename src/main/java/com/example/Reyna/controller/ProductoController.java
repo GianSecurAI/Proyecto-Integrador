@@ -4,10 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.example.Reyna.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +26,10 @@ public class ProductoController {
     @GetMapping
     public List<Producto> getAllProductos() {
         return productoService.obtenerTodos();
+    }
+    @PostMapping
+    public Producto crearProducto(@RequestBody Producto producto) {
+    return productoService.guardarProducto(producto);
     }
 
     @Autowired
@@ -41,4 +49,12 @@ public class ProductoController {
                 .headers(headers)
                 .body(bytes);
     }
+    @GetMapping("/admin/solo-admin")
+    public ResponseEntity<String> soloParaAdmin(@AuthenticationPrincipal User user) {
+    if (user.isAdmin()) {
+        return ResponseEntity.ok("¡Bienvenido, administrador!");
+    } else {
+        return ResponseEntity.status(403).body("Acceso denegado");
+    }
+}
 }

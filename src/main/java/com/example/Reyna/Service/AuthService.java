@@ -28,8 +28,8 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         // Autentica el usuario usando Spring Security (verifica nickname y contraseña)
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getNombre_completo(), request.getContraseña()));
-        User user = userRepository.findByNombreCompleto(request.getNombre_completo()).orElseThrow();
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getCorreo(), request.getContraseña()));
+        User user = userRepository.findByCorreo(request.getCorreo()).orElseThrow();
         String token=jwtService.getToken(user);
         return AuthResponse.builder()
             .token(token)
@@ -44,7 +44,7 @@ public class AuthService {
             .telefono(request.getTelefono())
             .direccion(request.getDireccion())
             .estado(request.getEstado())
-            .role(Role.USER)
+            .role(request.getRole())
             .build();
 
         userRepository.save(user);

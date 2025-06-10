@@ -1,5 +1,6 @@
 package com.example.Reyna.model;
 
+import com.example.Reyna.model.User;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
@@ -153,4 +154,17 @@ public class User implements UserDetails {
     public void setRole(Role role) {
         this.role = role;
     }
+        // Métodos de validación de rol
+    public boolean isAdmin() {
+        return (id_rol != null && id_rol == 1) || (role != null && role.name().equalsIgnoreCase("ADMINISTRADOR"));
+    }
+
+    public boolean isVendedor() {
+        return (id_rol != null && id_rol == 2) || (role != null && role.name().equalsIgnoreCase("VENDEDOR"));
+    }
+
+    public boolean isCliente() {
+        return (id_rol != null && id_rol == 3) || (role != null && role.name().equalsIgnoreCase("CLIENTE"));
+    }
+
 }
