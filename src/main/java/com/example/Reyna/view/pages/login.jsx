@@ -41,6 +41,7 @@ const Login = () => {
     } catch {
       data = { message: 'Error inesperado del servidor' };
     }
+<<<<<<< HEAD
 
     if (response.ok) 
       {
@@ -71,8 +72,18 @@ const Login = () => {
   }
 };
 
+=======
+  };
+>>>>>>> d6c53f20dccef9231f2b50a47bfc9e5f0499df9d
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar que el teléfono tenga exactamente 9 dígitos
+    if (registerPhone.length !== 9 || !/^\d{9}$/.test(registerPhone)) {
+      alert('El número de teléfono debe contener exactamente 9 dígitos numéricos');
+      return;
+    }
+    
     const user = {
       nombre: registerNombre, // Corregido para enviar nombre
       apellido: registerApellido, // Corregido para enviar apellido
@@ -244,15 +255,28 @@ const Login = () => {
                 >
                   <i className={`bi ${showRegisterPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                 </button>
-              </div>
-              <div className="form-group">
-                <label htmlFor="register-phone">Teléfono</label>
+              </div>              <div className="form-group">
+                <label htmlFor="register-phone">Teléfono *</label>
                 <input
                   type="tel"
                   id="register-phone"
                   value={registerPhone}
-                  onChange={(e) => setRegisterPhone(e.target.value)}
+                  onChange={(e) => {
+                    // Solo permitir dígitos
+                    const value = e.target.value.replace(/\D/g, '');
+                    // Limitar a 9 dígitos
+                    if (value.length <= 9) {
+                      setRegisterPhone(value);
+                    }
+                  }}
+                  pattern="[0-9]{9}"
+                  title="El número de teléfono debe contener exactamente 9 dígitos"
+                  placeholder="Ingresa 9 dígitos numéricos"
+                  required
                 />
+                {registerPhone && registerPhone.length !== 9 && (
+                  <small style={{ color: 'red' }}>El teléfono debe tener exactamente 9 dígitos</small>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="register-address">Dirección</label>

@@ -13,8 +13,9 @@ import categoriaTratamientosImg from '../../../../../../../assets/img/categoria-
 import categoriaMaquillajeImg from '../../../../../../../assets/img/categoria-maquillaje.png';
 import categoriaCuidadoImg from '../../../../../../../assets/img/categoria-cuidado.png';
 import prodFrag1Img from '../../../../../../../assets/img/prod-frag1.png';
-// Si hay otras imágenes de productos, importarlas también. Ejemplo:
-// import prodFrag2Img from '../../../../../../../assets/img/prod-frag2.png';
+import prodFrag2Img from '../../../../../../../assets/img/prod-frag2.png';
+import prodFrag3Img from '../../../../../../../assets/img/prod-frag3.png';
+import prodFrag6Img from '../../../../../../../assets/img/prod-frag6.png';
 import promoRegaloBgImg from '../../../../../../../assets/img/promo-regalo.png';
 import promoDescuentoBgImg from '../../../../../../../assets/img/promo-descuento.png';
 
@@ -48,21 +49,40 @@ const Home = () => {
       {/* Título de Productos Estrella */}
       <div className="section-title-container productos-estrella-title-container">
         <h2 className="section-title">NUESTROS PRODUCTOS ESTRELLA</h2>
-      </div>
-      <section className="productos-estrella py-4 py-md-5" style={{ background: '#f8f3f7' }}>
+      </div>      <section className="productos-estrella py-4 py-md-5" style={{ background: '#f8f3f7' }}>
         <div className="container">
           <div className="row g-3 g-md-4 justify-content-center">
             <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-              <ProductCard image={prodFrag1Img} name="Set Cori Rosé: Parfum + Loción Perfumada" price="S/ 119.00" link="/productos/1" />
+              <ProductCard 
+                image={prodFrag1Img} 
+                name="Set Ccori Rosé: Parfum + Loción Perfumada" 
+                price="S/ 119.00" 
+                link="/producto/ccori-rose" 
+              />
             </div>
             <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-              <ProductCard image={prodFrag1Img} name="Set Cori Rosé: Parfum + Loción Perfumada" price="S/ 119.00" link="/productos/2" />
+              <ProductCard 
+                image={prodFrag2Img} 
+                name="Cielo en Rosa Eau de Parfum" 
+                price="S/ 113.00" 
+                link="/producto/cielo-rosa" 
+              />
             </div>
             <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-              <ProductCard image={prodFrag1Img} name="Set Cori Rosé: Parfum + Loción Perfumada" price="S/ 119.00" link="/productos/3" />
+              <ProductCard 
+                image={prodFrag3Img} 
+                name="Set Sauvage Dior: Parfum + Estuche Elegante" 
+                price="S/ 105.00" 
+                link="/producto/sauvage-dior" 
+              />
             </div>
             <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-              <ProductCard image={prodFrag1Img} name="Set Cori Rosé: Parfum + Loción Perfumada" price="S/ 119.00" link="/productos/4" />
+              <ProductCard 
+                image={prodFrag6Img} 
+                name="Bombshell Seduction Eau de Parfum" 
+                price="S/ 180.00" 
+                link="/producto/prod-frag6" 
+              />
             </div>
           </div>
         </div>

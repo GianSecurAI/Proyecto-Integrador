@@ -164,9 +164,9 @@ const CarritoPage = () => {
                       <span>TOTAL:</span>
                       <span>{formatPrice(total)}</span>
                     </div>                    <div className="text-end mt-3">
-                      <button className="btn checkout-btn">
+                      <Link to="/checkout" className="btn checkout-btn">
                         Comprar
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>

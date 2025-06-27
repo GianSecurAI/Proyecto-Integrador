@@ -8,6 +8,7 @@ import ContactoPage from './main/java/com/example/Reyna/view/pages/contacto.jsx'
 import ProductoPage from './main/java/com/example/Reyna/view/pages/productopage.jsx'; // Importar ProductoPage
 import Login from './main/java/com/example/Reyna/view/pages/login.jsx'; // Importar Login
 import CarritoPage from './main/java/com/example/Reyna/view/pages/carrito.jsx'; // Importar CarritoPage
+import CheckoutPage from './main/java/com/example/Reyna/view/pages/checkout.jsx'; // Importar CheckoutPage
 import Dashboard from './main/java/com/example/Reyna/view/pages/admin/Dashboard.jsx'; // Importar Dashboard
 import ProductosAdmin from './main/java/com/example/Reyna/view/pages/admin/ProductosAdmin.jsx'; // Importar ProductosAdmin
 import ClientesAdmin from './main/java/com/example/Reyna/view/pages/admin/ClientesAdmin.jsx'; // Importar ClientesAdmin
@@ -20,10 +21,10 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/nosotros" element={<NosotrosPage />} />
-        <Route path="/contacto" element={<ContactoPage />} />
-        <Route path="/producto/:id" element={<ProductoPage />} /> {/* Ruta dinámica para todos los productos */}
+        <Route path="/contacto" element={<ContactoPage />} />        <Route path="/producto/:id" element={<ProductoPage />} /> {/* Ruta dinámica para todos los productos */}
         <Route path="/login" element={<Login />} /> {/* Ruta para Login */}
         <Route path="/carrito" element={<CarritoPage />} /> {/* Ruta para Carrito */}
+        <Route path="/checkout" element={<CheckoutPage />} /> {/* Ruta para Checkout */}
           {/* Rutas de administración */}
         <Route path="/admin/dashboard" element={<Dashboard />} /> {/* Ruta para el panel de administración */}
         <Route path="/admin/productos" element={<ProductosAdmin />} /> {/* Ruta para la administración de productos */}

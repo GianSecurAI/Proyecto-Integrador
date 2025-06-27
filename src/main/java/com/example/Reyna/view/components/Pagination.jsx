@@ -15,8 +15,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             className="page-link"
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-          >
-            &laquo; Previous
+          >          &laquo; Anterior
           </button>
         </li>
         {pages.map((page) => (
@@ -32,7 +31,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            Next &raquo;
+            Siguiente &raquo;
           </button>
         </li>
       </ul>
