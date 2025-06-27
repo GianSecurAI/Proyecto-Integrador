@@ -44,8 +44,8 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailService() {
-        return nombre_completo -> userRepository.findByCorreo(nombre_completo)
-        .orElseThrow(()-> new UsernameNotFoundException("User not fournd"));
+        return correo -> userRepository.findByCorreo(correo)
+        .orElseThrow(() -> new UsernameNotFoundException("User not fournd"));
     }
 
 }

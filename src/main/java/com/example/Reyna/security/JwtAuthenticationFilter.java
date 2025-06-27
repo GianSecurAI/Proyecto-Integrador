@@ -30,16 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
        
         final String token = getTokenFromRequest(request);
-        System.out.println("TOKEN RECIBIDO EN FILTRO: " + token);
         final String nombre_completo;
-        String path = request.getRequestURI();
-
-        
-        if (path.startsWith("/auth") ||
-        (path.startsWith("/api/productos") && request.getMethod().equals("GET"))) {
-        filterChain.doFilter(request, response);
-        return;
-    }
 
         if (token==null)
         {

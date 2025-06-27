@@ -1,5 +1,5 @@
 // filepath: /workspaces/Pruebas-de-codigo/src/pages/login.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
@@ -8,7 +8,8 @@ import '../styles/login.css';
 const Login = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [registerName, setRegisterName] = useState('');
+  const [registerNombre, setRegisterNombre] = useState(''); // Cambiado de registerName
+  const [registerApellido, setRegisterApellido] = useState(''); // Nuevo estado para apellido
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerPhone, setRegisterPhone] = useState('');
@@ -18,54 +19,15 @@ const Login = () => {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Si ya hay usuario logueado, redirigir al home
-    const user = localStorage.getItem('user');
-    if (user) navigate('/');
-
-    // Crear usuario administrador por defecto
-    const createAdminUser = async () => {
-      const adminUser = {
-        nombreCompleto: "Administrador",
-        correo: "admin@gmail.com",
-        contraseña: "admin123",
-        telefono: "999999999",
-        direccion: "Administración Central",
-        estado: "activo",
-        id_rol: 1,
-        role: "ADMIN"
-      };
-
-      try {
-            const response = await fetch('http://localhost:3001/auth/register', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(adminUser)
-          });
-
-        if (response.ok) {
-          console.log('Usuario administrador creado con éxito');
-        } else {
-          console.log('El usuario administrador ya existe');
-        }
-      } catch (error) {
-        console.error('Error al crear usuario administrador:', error);
-      }
-    };
-
-    createAdminUser();
-  }, [navigate]);
 
   const handleLoginSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch('http://localhost:3001/auth/login', {
+    const response = await fetch('http://localhost:8080/auth/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         correo: loginEmail,
@@ -80,20 +42,29 @@ const Login = () => {
       data = { message: 'Error inesperado del servidor' };
     }
 
-    if (response.ok) {
+    if (response.ok) 
+      {
+
+      // Para depurar, muestra en la consola la respuesta completa del backend
+      console.log("Respuesta del backend:", JSON.stringify(data, null, 2));
+      
       localStorage.setItem('user', JSON.stringify(data.data));
       localStorage.setItem('token', data.token);
+      console.log("User data stored in localStorage:", data.data);
       alert(data.message);
 
-      if (data.data.role === "ADMIN") {
+       // Redirigir según el nombre del rol para mayor claridad y robustez
+      if (data.data && data.data.rol && data.data.rol.nombre === 'ADMINISTRADOR') {
+        console.log("Redirigiendo al dashboard de admin...");
         navigate('/admin/dashboard');
       } else {
+        console.log("Redirigiendo a la página de inicio...");
         navigate('/');
       }
-      window.location.reload();
-    } else {
-      alert(data.message);
-    }
+    } else 
+  {
+    alert(data.message);
+  }
   } catch (error) {
     console.error('Error de red:', error);
     alert('Error al conectar con el servidor');
@@ -103,21 +74,19 @@ const Login = () => {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     const user = {
-      nombreCompleto: registerName,
+      nombre: registerNombre, // Corregido para enviar nombre
+      apellido: registerApellido, // Corregido para enviar apellido
       correo: registerEmail,
       contraseña: registerPassword,
       telefono: registerPhone,
-      direccion: registerAddress,
-      estado: "activo",
-      id_rol: 3,
-      role: "CLIENTE"
+      direccion: registerAddress
     };
 
     try {
-      const response = await fetch('http://localhost:3001/auth/register', {
+      const response = await fetch('http://localhost:8080/auth/register', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(user)
       });
@@ -139,7 +108,8 @@ const Login = () => {
 
     setShowRegister(false);
     setLoginEmail(registerEmail);
-    setRegisterName('');
+    setRegisterNombre(''); // Limpiar estado
+    setRegisterApellido(''); // Limpiar estado
     setRegisterEmail('');
     setRegisterPassword('');
     setRegisterPhone('');
@@ -214,12 +184,22 @@ const Login = () => {
             <h2>Registrarse</h2>
             <form onSubmit={handleRegisterSubmit}>
               <div className="form-group">
-                <label htmlFor="register-name">Nombre completo *</label>
+                <label htmlFor="register-nombre">Nombres *</label>
                 <input
                   type="text"
-                  id="register-name"
-                  value={registerName}
-                  onChange={(e) => setRegisterName(e.target.value)}
+                  id="register-nombre"
+                  value={registerNombre}
+                  onChange={(e) => setRegisterNombre(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="register-apellido">Apellidos *</label>
+                <input
+                  type="text"
+                  id="register-apellido"
+                  value={registerApellido}
+                  onChange={(e) => setRegisterApellido(e.target.value)}
                   required
                 />
               </div>

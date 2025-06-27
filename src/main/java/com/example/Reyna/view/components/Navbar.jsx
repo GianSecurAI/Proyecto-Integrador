@@ -13,12 +13,12 @@ const Navbar = () => {
   const cartPanelRef = useRef(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      setUser(null);
-    }
+  const storedUser = localStorage.getItem('user');
+  if (storedUser && storedUser !== "undefined") {
+    setUser(JSON.parse(storedUser));
+  } else {
+    setUser(null);
+  }
     
     // Actualizar la cuenta del carrito al cargar
     updateCartCount();

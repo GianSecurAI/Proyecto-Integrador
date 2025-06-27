@@ -1,46 +1,47 @@
+create database db_reyna;
 -- Tabla de roles
 CREATE TABLE Rol (
-    id_rol Bigserial PRIMARY KEY,
+    id_rol BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL
 );
 
 -- Tabla de usuarios
 CREATE TABLE Usuario (
-    id_usuario Bigserial PRIMARY KEY,
+    id_usuario BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre_completo VARCHAR(100) NOT NULL,
     correo VARCHAR(100) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),
     direccion VARCHAR(200),
-    id_rol INT NOT NULL,
+    id_rol BIGINT NOT NULL,
     estado BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
 );
 
 -- Tabla de categorías de productos
 CREATE TABLE Categoria (
-    id_categoria Bigserial PRIMARY KEY,
+    id_categoria BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre_categoria VARCHAR(100) NOT NULL
 );
 
 -- Tabla de productos
 CREATE TABLE Producto (
-    id_producto Bigserial PRIMARY KEY,
+    id_producto BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre_producto VARCHAR(100) NOT NULL,
     codigo VARCHAR(50) NOT NULL UNIQUE,
     marca VARCHAR(100),
     contenido VARCHAR(100),
     descripcion TEXT,
-    precio DECIMAL(10, 2) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
     stock INT NOT NULL,
-    id_categoria INT NOT NULL,
+    id_categoria BIGINT NOT NULL,
     estado BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria)
 );
 
 -- Tabla de proveedores
 CREATE TABLE Proveedor (
-    id_proveedor Bigserial PRIMARY KEY,
+    id_proveedor BIGINT AUTO_INCREMENT PRIMARY KEY,
     razon_social VARCHAR(150) NOT NULL,
     ruc VARCHAR(15) NOT NULL UNIQUE,
     telefono VARCHAR(20),
@@ -49,8 +50,8 @@ CREATE TABLE Proveedor (
 
 -- Relación muchos a muchos entre productos y proveedores
 CREATE TABLE Producto_Proveedor (
-    id_producto INT,
-    id_proveedor INT,
+    id_producto BIGINT,
+    id_proveedor BIGINT,
     PRIMARY KEY (id_producto, id_proveedor),
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto),
     FOREIGN KEY (id_proveedor) REFERENCES Proveedor(id_proveedor)
@@ -58,33 +59,33 @@ CREATE TABLE Producto_Proveedor (
 
 -- Pedidos realizados por clientes
 CREATE TABLE Pedido (
-    id_pedido Bigserial PRIMARY KEY,
-    id_cliente INT NOT NULL,
-    fecha_pedido DATETIME DEFAULT NOW(),
+    id_pedido BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente BIGINT NOT NULL,
+    fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado_pedido VARCHAR(50) DEFAULT 'Pendiente',
-    total DECIMAL(10, 2) NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (id_cliente) REFERENCES Usuario(id_usuario)
 );
 
 -- Detalles del pedido
 CREATE TABLE Detalle_Pedido (
-    id_detalle Bigserial PRIMARY KEY,
-    id_pedido INT NOT NULL,
-    id_producto INT NOT NULL,
+    id_detalle BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido BIGINT NOT NULL,
+    id_producto BIGINT NOT NULL,
     cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (id_pedido) REFERENCES Pedido(id_pedido),
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
 );
 
 -- Ventas realizadas
 CREATE TABLE Venta (
-    id_venta Bigserial PRIMARY KEY,
-    id_vendedor INT NOT NULL,
-    id_cliente INT NOT NULL,
-    fecha_venta DATETIME DEFAULT NOW(),
-    total DECIMAL(10, 2) NOT NULL,
+    id_venta BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_vendedor BIGINT NOT NULL,
+    id_cliente BIGINT NOT NULL,
+    fecha_venta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2) NOT NULL,
     tipo_comprobante VARCHAR(50),
     FOREIGN KEY (id_vendedor) REFERENCES Usuario(id_usuario),
     FOREIGN KEY (id_cliente) REFERENCES Usuario(id_usuario)
@@ -92,28 +93,29 @@ CREATE TABLE Venta (
 
 -- Detalles de cada venta
 CREATE TABLE Detalle_Venta (
-    id_detalle Bigserial PRIMARY KEY,
-    id_venta INT NOT NULL,
-    id_producto INT NOT NULL,
+    id_detalle BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_venta BIGINT NOT NULL,
+    id_producto BIGINT NOT NULL,
     cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (id_venta) REFERENCES Venta(id_venta),
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
 );
--- Tabla de estados (opcional, si quieres manejarlo como catálogo)
+
+-- Tabla de estados (opcional)
 CREATE TABLE Estado (
-    id_estado SERIAL PRIMARY KEY,
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
     nombre_estado VARCHAR(50) NOT NULL
 );
 
 -- Contactos o reclamos de clientes
 CREATE TABLE Contacto (
-    id_contacto Bigserial PRIMARY KEY,
-    id_cliente INT NOT NULL,
+    id_contacto BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente BIGINT NOT NULL,
     asunto VARCHAR(100),
     mensaje TEXT NOT NULL,
-    fecha DATETIME DEFAULT NOW(),
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado_respuesta VARCHAR(20) DEFAULT 'Pendiente',
     FOREIGN KEY (id_cliente) REFERENCES Usuario(id_usuario)
 );
@@ -139,6 +141,7 @@ INSERT INTO Estado (nombre_estado) VALUES
 
 -- Inserción de roles de usuario
 INSERT INTO Rol (nombre) VALUES
-('Administrador'),
-('Vendedor'),
-('Cliente');
+('ADMINISTRADOR'),
+('VENDEDOR'),
+('CLIENTE');
+

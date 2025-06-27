@@ -29,6 +29,7 @@ const App = () => {
         <Route path="/admin/productos" element={<ProductosAdmin />} /> {/* Ruta para la administración de productos */}
         <Route path="/admin/clientes" element={<ClientesAdmin />} /> {/* Ruta para la administración de clientes */}
         <Route path="/admin/registrar-usuario" element={<RegistrarUsuario />} /> {/* Ruta para registrar un nuevo usuario */}
+        
       </Routes>
     </Router>
   );

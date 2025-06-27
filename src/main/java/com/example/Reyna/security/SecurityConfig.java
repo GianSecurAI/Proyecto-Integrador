@@ -1,65 +1,62 @@
 package com.example.Reyna.security;
 
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
+import java.util.Arrays;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-    import org.springframework.security.config.http.SessionCreationPolicy;
-    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-    import org.springframework.security.crypto.password.PasswordEncoder;
-    import org.springframework.security.web.SecurityFilterChain;
-    import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-    
-    import com.example.Reyna.security.JwtAuthenticationFilter;
-    
-    import lombok.RequiredArgsConstructor;
-    
-    @Configuration
-    @EnableWebSecurity
-    @RequiredArgsConstructor
-    
-    public class SecurityConfig {
-    
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;
-        private final AuthenticationProvider authProvider;
-    
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
-        {
-            return http
-                .cors()
-                .and()
-                .csrf(csrf -> 
-                    csrf
-                    .disable())
-                .authorizeHttpRequests(authRequest ->
-                authRequest
-                // Público: autenticación y ver productos
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                // Solo ADMINISTRADOR puede editar/eliminar productos y ver ventas
-                .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAuthority("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasAuthority("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.GET, "/api/ventas/**").hasAuthority("ADMINISTRADOR")
-                // ADMINISTRADOR y VENDEDOR pueden crear productos y ventas
-                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
-                .requestMatchers(HttpMethod.POST, "/api/ventas/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
-                // CLIENTE solo puede comprar (ajusta el endpoint si es diferente)
-                .requestMatchers(HttpMethod.POST, "/api/compras/**").hasAuthority("CLIENTE")
-                // Todo lo demás requiere autenticación
-                .anyRequest().authenticated()
-)
-                .sessionManagement(sessionManager->
-                    sessionManager 
-                      .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationProvider authProvider;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(authRequest -> authRequest
+                        // Endpoints públicos (sin autenticación)
+                        .requestMatchers("/auth/**").permitAll()
+                        // Endpoints solo para ADMINISTRADOR
+                        .requestMatchers(HttpMethod.POST, "/admin/register-usuario").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers("/admin/users/**").hasAuthority("ADMINISTRADOR") // Permite todas las operaciones CRUD para usuarios/clientes (incluye /admin/users/register-client si existiera)
+                        // Endpoints para ADMINISTRADOR y VENDEDOR
+                        .requestMatchers("/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
+                        .requestMatchers(HttpMethod.GET, "/api/ventas/**").hasAuthority("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/ventas/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
+                        .requestMatchers("/api/compras/**").hasAuthority("CLIENTE")
+                        .anyRequest().authenticated())
+                .sessionManagement(sessionManager -> sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-                
-                
-        }
-    
     }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}

@@ -18,7 +18,25 @@ public class Producto {
     @Column(name = "precio")
     private Double precio;
 
-    @Column(name = "categoria")
-    private Integer categoria;
+    @ManyToOne
+    @JoinColumn(name = "id_categoria")
+    private Categoria categoria;
 
+    @Column(name = "codigo", nullable = false, unique = true)
+    private String codigo;
+
+    @Column(name = "stock")
+    private int stock;
+
+    @Column(name = "marca")
+    private String marca;
+
+    @Column(name = "estado")
+    private boolean estado;
+    
+    @Column(name = "contenido")
+    private String contenido;
+
+    @Column(name = "descripcion")
+    private String descripcion;
 }

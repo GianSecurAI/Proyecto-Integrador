@@ -3,7 +3,9 @@ package com.example.Reyna.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.example.Reyna.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.Reyna.model.Producto;
 import com.example.Reyna.Service.ProductoService;
 import com.example.Reyna.util.ExcelExporter;
@@ -28,10 +29,21 @@ public class ProductoController {
         return productoService.obtenerTodos();
     }
     @PostMapping
-    public Producto crearProducto(@RequestBody Producto producto) {
-    return productoService.guardarProducto(producto);
+        public Producto crearProducto(@AuthenticationPrincipal User user, @RequestBody Producto producto) {
+        System.out.println("Usuario autenticado: " + user.getCorreo() + ", Rol: " + user.getRol().getNombre());
+        return productoService.guardarProducto(producto);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
+        Producto productoActualizado = productoService.actualizarProducto(id, producto);
+        return ResponseEntity.ok(productoActualizado);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
+    }
     @Autowired
     private ProductoService productoService;
 
@@ -51,10 +63,12 @@ public class ProductoController {
     }
     @GetMapping("/admin/solo-admin")
     public ResponseEntity<String> soloParaAdmin(@AuthenticationPrincipal User user) {
-    if (user.isAdmin()) {
+      // Corregido: Verificar el rol a través del objeto Rol
+    if (user.getRol() != null && "ADMINISTRADOR".equals(user.getRol().getNombre())) {
         return ResponseEntity.ok("¡Bienvenido, administrador!");
     } else {
         return ResponseEntity.status(403).body("Acceso denegado");
     }
+
 }
 }

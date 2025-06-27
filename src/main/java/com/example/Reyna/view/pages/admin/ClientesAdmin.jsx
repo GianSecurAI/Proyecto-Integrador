@@ -3,45 +3,71 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import '../../styles/ClientesAdmin.css';
+import apiClient from '../../../api/apiClient'; // RUTA CORREGIDA
+
+const API_CLIENTES_URL = '/admin/users/clientes'; // Endpoint para obtener clientes
+const API_USERS_BASE_URL = '/admin/users'; // Endpoint base para operaciones CRUD de usuarios
 
 const ClientesAdmin = () => {
-  const navigate = useNavigate();  const [clientes, setClientes] = useState([
-    { id: '001', nombre: 'Mariano', apellido: 'Torres', email: 'mariano.torres@example.com', direccion: 'Av. Primavera 123 - Surco', celular: '987654321', pedidos: 0 },
-    { id: '002', nombre: 'Jorge', apellido: 'Ramirez', email: 'j.ramirez@example.com', direccion: 'Jr. Los Jardines 456 - San Borja', celular: '965432187', pedidos: 2 },
-    { id: '003', nombre: 'Lucia', apellido: 'Mendoza', email: 'lucia.mendoza@example.com', direccion: 'Calle Las Violetas 789 - Miraflor', celular: '912345678', pedidos: 4 }
-  ]);
-  const [clientesOriginales, setClientesOriginales] = useState([]);
-  const [mostrarModal, setMostrarModal] = useState(false);
-  const [mostrarModalBusqueda, setMostrarModalBusqueda] = useState(false);
-  const [mostrarModalResultado, setMostrarModalResultado] = useState(false);
-  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);  const [nuevoCliente, setNuevoCliente] = useState({
-    id: '',
-    nombre: '',
-    apellido: '',
-    email: '',
-    direccion: '',
-    celular: '',
-    pedidos: 0
-  });
+
+  const navigate = useNavigate();
+  const [clientes, setClientes] = useState([]); // Stores fetched clients
+  const [mostrarModalBusqueda, setMostrarModalBusqueda] = useState(false); // Search client modal
+  const [mostrarModalResultado, setMostrarModalResultado] = useState(false); // Search result modal
+  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false); // Edit client modal
   const [clienteEditando, setClienteEditando] = useState(null);
   const [busquedaCliente, setBusquedaCliente] = useState({
     id: ''
   });
   const [clienteEncontrado, setClienteEncontrado] = useState(null);
   const [errores, setErrores] = useState({});
-  const [cambiosPendientes, setCambiosPendientes] = useState(false);
-  useEffect(() => {
-    // Guardar una copia de los clientes originales al cargar el componente
-    setClientesOriginales([...clientes]);
-  }, []);
+  const [loading, setLoading] = useState(true); // Loading state for API calls
+  const [error, setError] = useState(null); // Error state for API calls
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNuevoCliente(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Function to fetch all clients from the backend
+  const fetchClientes = async (query = '') => { // Added query parameter
+    setLoading(true);
+    setError(null);
+    try {
+      const url = query ? `${API_CLIENTES_URL}?query=${encodeURIComponent(query)}` : API_CLIENTES_URL;
+      const response = await apiClient(url);
+
+      // Manejar específicamente el estado 204 No Content
+      if (response.status === 204) {
+        setClientes([]); // No hay clientes, establecer una lista vacía
+        return; // Salir de la función, no hay JSON que parsear
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      // Map backend User fields to frontend Cliente fields
+      const mappedClients = data.map(user => {
+        // Usar user.nombre y user.apellido directamente del backend
+        const nombre = user.nombre || '';
+        const apellido = user.apellido || '';
+        return {
+          id: user.id_usuario, // Map id_usuario to id
+          nombre: nombre,
+          apellido: apellido,
+          email: user.correo,
+          direccion: user.direccion,
+          celular: user.telefono, // Map telefono to celular
+          pedidos: 0, // Placeholder, as 'pedidos' is not in backend User model
+        };
+      });
+      setClientes(mappedClients);
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+      setError("Error al cargar los clientes. Intente de nuevo más tarde.");
+      alert(`Error al cargar clientes: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
+  useEffect(() => {
+    fetchClientes();
+  }, []);
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,126 +76,126 @@ const ClientesAdmin = () => {
       [name]: value
     }));
   };
-  const handleAgregarClick = () => {
-    setMostrarModal(true);
-  };
-
-  const handleCancelarClick = () => {
-    setMostrarModal(false);
-    setNuevoCliente({
-      id: '',
-      nombre: '',
-      apellido: '',
-      email: '',
-      direccion: '',
-      celular: '',
-      pedidos: 0
-    });
-    setErrores({});
-  };
 
   const handleEditar = () => {
     setClienteEditando({...clienteEncontrado});
     setMostrarModalResultado(false);
     setMostrarModalEdicion(true);
   };
-
+  
   const handleCancelarEdicion = () => {
     setMostrarModalEdicion(false);
     setClienteEditando(null);
     setErrores({});
   };
 
-  const handleGuardarEdicion = () => {
-    if (validarFormulario(clienteEditando)) {
-      const clientesActualizados = clientes.map(cliente => 
-        cliente.id === clienteEditando.id ? {...clienteEditando} : cliente
-      );
-      
-      setClientes(clientesActualizados);
-      setCambiosPendientes(true);
-      setMostrarModalEdicion(false);
-      setClienteEditando(null);
-      setErrores({});
-    }
-  };
-  const validarFormulario = (cliente = nuevoCliente) => {
+
+   const validarFormulario = (clienteData, isEdit = false) => {
     const nuevosErrores = {};
     
-    if (!cliente.id.trim()) {
-      nuevosErrores.id = 'El código es requerido';
-    } else if (cliente !== clienteEditando && clientes.some(c => c.id === cliente.id)) {
-      nuevosErrores.id = 'Este código ya existe';
-    }
+    // For new clients, ID is auto-generated by backend, so no frontend ID validation
+    // For editing, ID is read-only, so no validation needed here.
     
-    if (!cliente.nombre.trim()) {
+    if (!clienteData.nombre.trim()) {
       nuevosErrores.nombre = 'El nombre es requerido';
     }
     
-    if (!cliente.apellido.trim()) {
+    if (!clienteData.apellido.trim()) {
       nuevosErrores.apellido = 'El apellido es requerido';
     }
     
-    if (!cliente.email.trim()) {
+    if (!clienteData.email.trim()) {
       nuevosErrores.email = 'El email es requerido';
-    } else if (!/\S+@\S+\.\S+/.test(cliente.email)) {
+    } else if (!/\S+@\S+\.\S/.test(clienteData.email)) {
       nuevosErrores.email = 'El formato de email no es válido';
     }
     
-    if (!cliente.direccion.trim()) {
+    if (!clienteData.direccion.trim()) {
       nuevosErrores.direccion = 'La dirección es requerida';
     }
     
-    if (!cliente.celular.trim()) {
+    if (!clienteData.celular.trim()) {
       nuevosErrores.celular = 'El celular es requerido';
-    } else if (!/^\d{9}$/.test(cliente.celular)) {
+    } else if (!/^\d{9}$/.test(clienteData.celular)) {
       nuevosErrores.celular = 'El celular debe tener 9 dígitos';
+    }
+
+    if (!isEdit && !clienteData.password.trim()) { // Password required only for new clients
+      nuevosErrores.password = 'La contraseña es requerida';
     }
     
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
-  const handleGuardarCliente = () => {
-    if (validarFormulario()) {
-      const nuevoClienteFormateado = {
-        ...nuevoCliente,
-        pedidos: Number(nuevoCliente.pedidos)
+
+  const handleGuardarEdicion = async () => {
+    if (validarFormulario(clienteEditando, true)) { // Pass true for isEdit
+      const userToUpdate = {
+        nombre: clienteEditando.nombre, // Enviar nombre por separado
+        apellido: clienteEditando.apellido, // Enviar apellido por separado
+        correo: clienteEditando.email,
+        telefono: clienteEditando.celular,
+        direccion: clienteEditando.direccion,
+        // password and estado are not typically updated via this form,
+        // assuming backend handles them or they are not changed.
+        // If password needs to be updated, a separate field would be needed.
       };
 
-      setClientes(prevClientes => [...prevClientes, nuevoClienteFormateado]);
-      setCambiosPendientes(true);
-      setMostrarModal(false);
-      setNuevoCliente({
-        id: '',
-        nombre: '',
-        apellido: '',
-        email: '',
-        direccion: '',
-        celular: '',
-        pedidos: 0
-      });
-      setErrores({});
+      try {
+        const response = await apiClient(`${API_USERS_BASE_URL}/${clienteEditando.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(userToUpdate),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        alert('Cliente actualizado con éxito!');
+        fetchClientes(); // Re-fetch all clients to update the table
+        setMostrarModalEdicion(false);
+        setClienteEditando(null);
+        setErrores({});
+      } catch (err) {
+        console.error("Error updating client:", err);
+        alert(`Error al actualizar el cliente: ${err.message}`);
+      }
     }
   };
 
-  const handleEliminarCliente = () => {
+  const handleEliminarCliente = async () => {
     if (window.confirm(`¿Está seguro que desea eliminar al cliente ${clienteEncontrado.nombre} ${clienteEncontrado.apellido}?`)) {
-      setClientes(prevClientes => prevClientes.filter(cliente => cliente.id !== clienteEncontrado.id));
-      setCambiosPendientes(true);
-      setMostrarModalResultado(false);
-      setClienteEncontrado(null);
+      try {
+        const response = await apiClient(`${API_USERS_BASE_URL}/${clienteEncontrado.id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        alert('Cliente eliminado con éxito!');
+        fetchClientes(); // Re-fetch all clients to update the table
+        setMostrarModalResultado(false);
+        setClienteEncontrado(null);
+      } catch (err) {
+        console.error("Error deleting client:", err);
+        alert(`Error al eliminar el cliente: ${err.message}`);
+      }
     }
   };
 
   const handleGuardarCambios = () => {
-    // Aquí se implementaría la lógica para guardar los cambios en el backend
-    // Por ahora, solo actualizamos los clientes originales para sincronizarlos
-    setClientesOriginales([...clientes]);
-    setCambiosPendientes(false);
-    alert('Cambios guardados con éxito');
+    // This button now acts as a "Refresh Data" button, as CUD operations are immediate.
+    fetchClientes();
+    alert('Datos actualizados desde el servidor.');
   };
   const handleBuscarClick = () => {
     setMostrarModalBusqueda(true);
+    setBusquedaCliente({ id: '' }); // Clear previous search ID
+    setErrores({}); // Clear errors
   };
 
   const handleCancelarBusqueda = () => {
@@ -177,16 +203,45 @@ const ClientesAdmin = () => {
     setBusquedaCliente({
       id: ''
     });
+     setErrores({});
   };
 
-  const handleBuscarCliente = () => {
-    const cliente = clientes.find(c => c.id === busquedaCliente.id);
-    if (cliente) {
-      setClienteEncontrado(cliente);
-      setMostrarModalBusqueda(false);
-      setMostrarModalResultado(true);
-    } else {
-      alert('No se encontró ningún cliente con ese código');
+  const handleBuscarCliente = async () => {
+    if (!busquedaCliente.id.trim()) {
+      setErrores({ id: 'Ingrese un código para buscar.' });
+      return;
+    }
+    setErrores({}); // Clear previous errors
+
+    try {
+      const response = await apiClient(`${API_USERS_BASE_URL}/${busquedaCliente.id}`);
+      if (response.status === 404) {
+        alert('No se encontró ningún cliente con ese código.');
+        setClienteEncontrado(null);
+      } else if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      } else {
+        const data = await response.json();
+        // Usar data.nombre y data.apellido directamente
+        const nombre = data.nombre || '';
+        const apellido = data.apellido || '';
+        setClienteEncontrado({
+          id: data.id_usuario,
+          nombre: nombre,
+          apellido: apellido,
+          email: data.correo,
+          direccion: data.direccion,
+          celular: data.telefono,
+          pedidos: 0, // Placeholder
+        });
+        setMostrarModalBusqueda(false);
+        setMostrarModalResultado(true);
+      }
+    } catch (err) {
+      console.error("Error searching client:", err);
+      alert(`Error al buscar el cliente: ${err.message}`);
+      setClienteEncontrado(null);
     }
   };
 
@@ -203,28 +258,12 @@ const ClientesAdmin = () => {
     setClienteEncontrado(null);
   };
   const handleSalir = () => {
-    // Si hay cambios pendientes, preguntar si desea guardarlos
-    if (cambiosPendientes) {
-      if (window.confirm('Hay cambios sin guardar. ¿Desea guardarlos antes de salir?')) {
-        handleGuardarCambios();
-      }
-    }
     navigate('/admin/dashboard');
   };
 
   const handleBusquedaRapida = (e) => {
-    const query = e.target.value.toLowerCase();
-    if (!query) {
-      setClientes([...clientesOriginales]);
-    } else {
-      const clientesFiltrados = clientesOriginales.filter(
-        cliente => 
-          cliente.id.toLowerCase().includes(query) ||
-          cliente.nombre.toLowerCase().includes(query) ||
-          cliente.apellido.toLowerCase().includes(query)
-      );
-      setClientes(clientesFiltrados);
-    }
+    const query = e.target.value.toLowerCase();  
+    fetchClientes(query);
   };
 
   return (
@@ -235,112 +274,16 @@ const ClientesAdmin = () => {
         <div className="clientes-header">
           <h1>Mantenimiento de Clientes</h1>
             <div className="clientes-acciones">
-            <button className="btn-accion btn-agregar" onClick={handleAgregarClick}>AGREGAR CLIENTE</button>
             <button className="btn-accion btn-buscar" onClick={handleBuscarClick}>BUSCAR CLIENTE</button>
             <button 
               className="btn-accion btn-guardar" 
               onClick={handleGuardarCambios}
-              disabled={!cambiosPendientes}
-              style={{ opacity: cambiosPendientes ? 1 : 0.5 }}
             >
-              GUARDAR CAMBIOS
+              ACTUALIZA DATOS
             </button>
             <button className="btn-accion btn-salir" onClick={handleSalir}>SALIR</button>
           </div>
         </div>
-
-        {/* Modal de Nuevo Cliente */}
-        {mostrarModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h2>Nuevo Cliente</h2>
-              <hr className="divisor" />
-              <div className="form-grid">
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Código</label>
-                    <input
-                      type="text"
-                      name="id"
-                      placeholder="Ingrese código del cliente"
-                      value={nuevoCliente.id}
-                      onChange={handleInputChange}
-                      className={errores.id ? 'input-error' : ''}
-                    />
-                    {errores.id && <span className="error-message">{errores.id}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label>Nombre</label>
-                    <input
-                      type="text"
-                      name="nombre"
-                      placeholder="Ingrese nombre del cliente"
-                      value={nuevoCliente.nombre}
-                      onChange={handleInputChange}
-                      className={errores.nombre ? 'input-error' : ''}
-                    />
-                    {errores.nombre && <span className="error-message">{errores.nombre}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label>Apellido</label>
-                    <input
-                      type="text"
-                      name="apellido"
-                      placeholder="Ingrese apellido del cliente"
-                      value={nuevoCliente.apellido}
-                      onChange={handleInputChange}
-                      className={errores.apellido ? 'input-error' : ''}
-                    />
-                    {errores.apellido && <span className="error-message">{errores.apellido}</span>}
-                  </div>
-                </div>
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Ingrese email del cliente"
-                      value={nuevoCliente.email}
-                      onChange={handleInputChange}
-                      className={errores.email ? 'input-error' : ''}
-                    />
-                    {errores.email && <span className="error-message">{errores.email}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label>Dirección</label>
-                    <input
-                      type="text"
-                      name="direccion"
-                      placeholder="Ingrese dirección del cliente"
-                      value={nuevoCliente.direccion}
-                      onChange={handleInputChange}
-                      className={errores.direccion ? 'input-error' : ''}
-                    />
-                    {errores.direccion && <span className="error-message">{errores.direccion}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label>Celular</label>
-                    <input
-                      type="text"
-                      name="celular"
-                      placeholder="Ingrese celular del cliente"
-                      value={nuevoCliente.celular}
-                      onChange={handleInputChange}
-                      className={errores.celular ? 'input-error' : ''}
-                      maxLength="9"
-                    />
-                    {errores.celular && <span className="error-message">{errores.celular}</span>}
-                  </div>
-                </div>
-              </div>
-              <div className="modal-buttons">
-                <button onClick={handleCancelarClick} className="btn-cancelar">Cancelar</button>
-                <button onClick={handleGuardarCliente} className="btn-guardar">Guardar</button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Modal de Búsqueda */}
         {mostrarModalBusqueda && (
@@ -438,9 +381,21 @@ const ClientesAdmin = () => {
                   <button className="btn-eliminar" onClick={handleEliminarCliente}>Eliminar</button>
                   <button className="btn-editar" onClick={handleEditar}>Editar</button>
                 </div>
-                <button className="btn-guardar">Guardar Cliente</button>
               </div>
             </div>
+          </div>
+        )}
+        {loading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+            <p>Cargando clientes...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="error-message-banner">
+            <p>{error}</p>
+            <button onClick={() => fetchClientes()}>Reintentar</button>
           </div>
         )}
 
@@ -449,6 +404,7 @@ const ClientesAdmin = () => {
               <label>Buscar Clientes:</label>
               <div className="busqueda-input">
                 <input 
+                  id="quick-search"
                   type="text" 
                   placeholder="Ingrese código, nombre o apellido del cliente"
                   onChange={handleBusquedaRapida}
@@ -471,17 +427,24 @@ const ClientesAdmin = () => {
                 </tr>
               </thead>
               <tbody>
-                {clientes.map(cliente => (
-                  <tr key={cliente.id}>
-                    <td>{cliente.id}</td>
-                    <td>{cliente.nombre}</td>
-                    <td>{cliente.apellido}</td>
-                    <td>{cliente.email}</td>
-                    <td>{cliente.direccion}</td>
-                    <td>{cliente.celular}</td>
-                    <td>{cliente.pedidos}</td>
+                {clientes.length > 0 ? (
+                  clientes.map(cliente => (
+                    <tr key={cliente.id}>
+                      <td>{cliente.id}</td>
+                      <td>{cliente.nombre}</td>
+                      <td>{cliente.apellido}</td>
+                      <td>{cliente.email}</td>
+                      <td>{cliente.direccion}</td>
+                      <td>{cliente.celular}</td>
+                      <td>{cliente.pedidos}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center' }}>No hay clientes para mostrar.</td>
                   </tr>
-                ))}              </tbody>
+                )}
+                </tbody>
             </table>
           </div>
         </div>
@@ -497,6 +460,7 @@ const ClientesAdmin = () => {
                   <div className="form-group">
                     <label>Código</label>
                     <input
+                      id="edit-client-id"
                       type="text"
                       name="id"
                       value={clienteEditando.id}
@@ -508,6 +472,7 @@ const ClientesAdmin = () => {
                   <div className="form-group">
                     <label>Nombre</label>
                     <input
+                      id="edit-client-nombre"
                       type="text"
                       name="nombre"
                       value={clienteEditando.nombre}
@@ -519,6 +484,7 @@ const ClientesAdmin = () => {
                   <div className="form-group">
                     <label>Apellido</label>
                     <input
+                      id="edit-client-apellido"
                       type="text"
                       name="apellido"
                       value={clienteEditando.apellido}
@@ -532,6 +498,7 @@ const ClientesAdmin = () => {
                   <div className="form-group">
                     <label>Email</label>
                     <input
+                      id="edit-client-email"
                       type="email"
                       name="email"
                       value={clienteEditando.email}
@@ -543,6 +510,7 @@ const ClientesAdmin = () => {
                   <div className="form-group">
                     <label>Dirección</label>
                     <input
+                      id="edit-client-direccion"
                       type="text"
                       name="direccion"
                       value={clienteEditando.direccion}
@@ -554,6 +522,7 @@ const ClientesAdmin = () => {
                   <div className="form-group">
                     <label>Celular</label>
                     <input
+                      id="edit-client-celular"  
                       type="text"
                       name="celular"
                       value={clienteEditando.celular}
@@ -578,5 +547,4 @@ const ClientesAdmin = () => {
     </div>
   );
 };
-
 export default ClientesAdmin;

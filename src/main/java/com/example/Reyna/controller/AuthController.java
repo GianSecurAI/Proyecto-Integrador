@@ -1,42 +1,38 @@
 package com.example.Reyna.controller;
 
-// Importaciones necesarias para manejar respuestas HTTP y anotaciones de Spring
+import com.example.Reyna.Service.AuthService;
+import com.example.Reyna.dao.RolRepository;
+import com.example.Reyna.model.AuthResponse;
+import com.example.Reyna.model.LoginRequest;
+import com.example.Reyna.model.RegisterRequest;
+import com.example.Reyna.model.Rol;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.Reyna.Service.AuthService;
-import com.example.Reyna.model.AuthResponse;
-import com.example.Reyna.model.LoginRequest;
-import com.example.Reyna.model.RegisterRequest;
-
-import lombok.RequiredArgsConstructor;
-
-// Anotación que indica que esta clase es un controlador REST de Spring
 @RestController
-// Define la ruta base para todas las solicitudes que maneja este controlador
 @RequestMapping("/auth")
-// Genera un constructor con los atributos requeridos (final), útil para inyección de dependencias
 @RequiredArgsConstructor
-
 public class AuthController {
-    // Servicio que maneja la lógica de autenticación y registro
-    private final AuthService authService;
-    
 
-    // Recibe los datos de login en el cuerpo de la solicitud y los pasa al servicio
-    @PostMapping(value = "login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request)
-    {
+    private final AuthService authService;
+    private final RolRepository rolRepository;
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @PostMapping(value = "register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request)
-    {
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+        // Busca el rol "CLIENTE" y lo asigna al nuevo usuario.
+        Rol clienteRol = rolRepository.findById(3L) // Asumiendo que el ID del rol CLIENTE es 3
+                .orElseThrow(() -> new RuntimeException("Error: Rol con ID 3 (CLIENTE) no encontrado."));
+        request.setRol(clienteRol); // El RegisterRequest ya tiene nombre y apellido del frontend
+        request.setEstado(true); // Los clientes se activan por defecto.
         return ResponseEntity.ok(authService.register(request));
     }
-
 }

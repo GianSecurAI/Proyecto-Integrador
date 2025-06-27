@@ -27,7 +27,7 @@ public class ExcelExporter {
             Row row = sheet.createRow(rowIdx++);
             row.createCell(0).setCellValue(producto.getId_producto());
             row.createCell(1).setCellValue(producto.getNombre_producto());
-            row.createCell(2).setCellValue(producto.getCategoria());
+            row.createCell(2).setCellValue(producto.getCategoria() != null ? producto.getCategoria().getNombre_categoria() : "");
             row.createCell(3).setCellValue(producto.getPrecio());
         }
         workbook.write(out);
@@ -52,7 +52,8 @@ public class ExcelExporter {
             for (User user : users) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(user.getId_usuario());
-                row.createCell(1).setCellValue(user.getNombreCompleto());
+                // Concatenar nombre y apellido para la columna "Nombre Completo"
+                row.createCell(1).setCellValue(user.getNombre() + " " + user.getApellido());
                 row.createCell(2).setCellValue(user.getCorreo());
                 row.createCell(3).setCellValue(user.getTelefono());
                 row.createCell(4).setCellValue(user.getDireccion());
@@ -64,4 +65,3 @@ public class ExcelExporter {
     }
     
 }
-
