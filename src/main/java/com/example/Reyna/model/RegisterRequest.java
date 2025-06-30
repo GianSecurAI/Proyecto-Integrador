@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.example.Reyna.model.Rol;
 
 @Data
 @Builder
