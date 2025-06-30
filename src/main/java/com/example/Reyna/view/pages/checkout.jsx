@@ -18,16 +18,16 @@ const CheckoutPage = () => {
   
   // Datos del usuario
   const [userData, setUserData] = useState({
-    nombreCompleto: 'Carlos Rodríguez',
-    correo: 'carlos@ejemplo.com',
-    telefono: '987654321',
-    direccion: 'Av. Principal 123, Lima'
+    nombreCompleto: '',
+    correo: '',
+    telefono: '',
+    direccion: ''
   });
   
   // Edición temporal de los datos del usuario
-  const [tempUserData, setTempUserData] = useState({...userData});
+  const [tempUserData, setTempUserData] = useState({ ...userData });
 
-  // Cargar los productos del carrito desde localStorage al montar el componente
+  // Cargar los productos del carrito y los datos del usuario desde el backend al montar el componente
   useEffect(() => {
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
@@ -35,12 +35,30 @@ const CheckoutPage = () => {
       setCartItems(parsedCart);
       calculateTotals(parsedCart);
     } else {
-      // Si no hay items en el carrito, redirigir al carrito
       navigate('/carrito');
     }
-    
-    // En una aplicación real, aquí cargaríamos los datos del usuario desde el backend
-    // Por ahora usamos datos de ejemplo
+
+    // Obtener datos del usuario autenticado
+    const id_user = localStorage.getItem('id_user');
+    if (id_user) {
+      fetch(`/admin/users/${id_user}`)
+        .then(res => res.json())
+        .then(user => {
+          console.log('Usuario recibido:', user); // Para depuración
+          setUserData({
+            nombreCompleto: user.nombre + ' ' + user.apellido,
+            correo: user.correo,
+            telefono: user.telefono,
+            direccion: user.direccion
+          });
+          setTempUserData({
+            nombreCompleto: user.nombre + ' ' + user.apellido,
+            correo: user.correo,
+            telefono: user.telefono,
+            direccion: user.direccion
+          });
+        });
+    }
   }, [navigate]);
 
   // Función para calcular subtotales y totales
@@ -93,11 +111,39 @@ const CheckoutPage = () => {
   };
   
   // Enviar el pedido
-  const submitOrder = () => {
-    // En una aplicación real, aquí enviaríamos el pedido al backend
-    setSuccessModal(true);
-    // Limpiar el carrito
-    localStorage.removeItem('cart');
+  const submitOrder = async () => {
+    // Simulación de id_cliente (en una app real, obtén el id del usuario autenticado)
+    const id_cliente = 1; // Cambia esto por el id real del usuario logueado
+
+    // Construir el array de productos para el backend
+    const productos = cartItems.map(item => ({
+      id_producto: item.id, // asegúrate que el objeto tenga el id correcto
+      cantidad: item.quantity,
+      precioUnitario: item.price,
+      subtotal: item.price * item.quantity
+    }));
+
+    const pedido = {
+      id_cliente,
+      productos,
+      total
+    };
+
+    try {
+      const response = await fetch('/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pedido)
+      });
+      if (response.ok) {
+        setSuccessModal(true);
+        localStorage.removeItem('cart');
+      } else {
+        alert('Error al enviar el pedido. Intenta nuevamente.');
+      }
+    } catch (error) {
+      alert('Error de conexión con el servidor.');
+    }
   };
   
   // Cerrar el modal de éxito y redirigir

@@ -47,6 +47,11 @@ const Login = () => {
       console.log("Respuesta del backend:", JSON.stringify(data, null, 2));
       localStorage.setItem('user', JSON.stringify(data.data));
       localStorage.setItem('token', data.token);
+      if (data.data && data.data.id) {
+        localStorage.setItem('id_user', data.data.id);
+      } else {
+        localStorage.removeItem('id_user');
+      }
       console.log("User data stored in localStorage:", data.data);
       alert(data.message);
 
