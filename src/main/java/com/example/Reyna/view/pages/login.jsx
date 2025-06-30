@@ -41,20 +41,16 @@ const Login = () => {
     } catch {
       data = { message: 'Error inesperado del servidor' };
     }
-<<<<<<< HEAD
 
-    if (response.ok) 
-      {
-
+    if (response.ok) {
       // Para depurar, muestra en la consola la respuesta completa del backend
       console.log("Respuesta del backend:", JSON.stringify(data, null, 2));
-      
       localStorage.setItem('user', JSON.stringify(data.data));
       localStorage.setItem('token', data.token);
       console.log("User data stored in localStorage:", data.data);
       alert(data.message);
 
-       // Redirigir según el nombre del rol para mayor claridad y robustez
+      // Redirigir según el nombre del rol para mayor claridad y robustez
       if (data.data && data.data.rol && data.data.rol.nombre === 'ADMINISTRADOR') {
         console.log("Redirigiendo al dashboard de admin...");
         navigate('/admin/dashboard');
@@ -62,19 +58,15 @@ const Login = () => {
         console.log("Redirigiendo a la página de inicio...");
         navigate('/');
       }
-    } else 
-  {
-    alert(data.message);
-  }
+    } else {
+      alert(data.message);
+    }
   } catch (error) {
     console.error('Error de red:', error);
     alert('Error al conectar con el servidor');
   }
 };
 
-=======
-  };
->>>>>>> d6c53f20dccef9231f2b50a47bfc9e5f0499df9d
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     

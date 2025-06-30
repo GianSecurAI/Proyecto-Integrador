@@ -9,25 +9,8 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 const ProductosAdmin = () => {
-<<<<<<< HEAD
   const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
-=======
-  const navigate = useNavigate();  const [productos, setProductos] = useState([
-    { id: 'P001', nombre: 'Set Ccori Rosé: Parfum + Loción Perfumada', categoria: 'Perfumes', precio: 119 },
-    { id: 'P002', nombre: 'Cielo en Rosa Eau de Parfum', categoria: 'Perfumes', precio: 113 },
-    { id: 'P003', nombre: 'Set Sauvage Dior: Parfum + Estuche Elegante', categoria: 'Perfumes', precio: 105 },
-    { id: 'P004', nombre: 'Bombshell Seduction Eau de Parfum', categoria: 'Perfumes', precio: 180 },
-    { id: 'P005', nombre: 'Una Instinct Eau de Parfum', categoria: 'Perfumes', precio: 165 },
-    { id: 'P006', nombre: 'Fragancia Intensa para Hombre', categoria: 'Perfumes', precio: 150 },
-    { id: 'P007', nombre: 'Euforia Floral Collection', categoria: 'Perfumes', precio: 145 },
-    { id: 'P008', nombre: 'Set Elegance: Perfume + Body Lotion', categoria: 'Perfumes', precio: 135 },
-    { id: 'P009', nombre: 'Midnight Dreams Eau de Parfum', categoria: 'Perfumes', precio: 190 },
-    { id: 'P010', nombre: 'Sweet Garden Collection', categoria: 'Perfumes', precio: 170 },
-    { id: 'P011', nombre: 'Ocean Breeze For Men', categoria: 'Perfumes', precio: 155 },
-    { id: 'P012', nombre: 'Diamond Rose Limited Edition', categoria: 'Perfumes', precio: 210 }
-  ]);
->>>>>>> d6c53f20dccef9231f2b50a47bfc9e5f0499df9d
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('Todos');
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -146,7 +129,6 @@ const ProductosAdmin = () => {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-<<<<<<< HEAD
   const handleGuardarProducto = async () => {
     if (validarFormulario()) {
       const categoriaId = categorias.indexOf(nuevoProducto.categoria);
@@ -174,42 +156,6 @@ const ProductosAdmin = () => {
         console.error('Error al guardar producto:', error);
         alert('No se pudo guardar el producto');
       }
-=======
-const handleGuardarProducto = async () => {
-  if (validarFormulario()) {
-    try {
-      // En un entorno real, esta sería una llamada API
-      // Por ahora trabajaremos solo con el estado local
-      const nuevoId = nuevoProducto.codigo;
-      const productoFormateado = {
-        id: nuevoId,
-        nombre: nuevoProducto.nombre,
-        categoria: nuevoProducto.categoria,
-        marca: nuevoProducto.marca,
-        sexo: nuevoProducto.sexo,
-        precio: Number(nuevoProducto.precio)
-      };
-      
-      // Actualizar el estado de productos
-      setProductos(prevProductos => [...prevProductos, productoFormateado]);
-      
-      // Cerrar el modal y limpiar formulario
-      setMostrarModal(false);
-      setNuevoProducto({
-        nombre: '',
-        categoria: '',
-        marca: '',
-        sexo: '',
-        precio: '',
-        codigo: ''
-      });
-      setErrores({});
-      
-      // Mostrar mensaje de éxito
-      alert('Producto agregado con éxito');
-    } catch (error) {
-      alert('No se pudo guardar el producto');
->>>>>>> d6c53f20dccef9231f2b50a47bfc9e5f0499df9d
     }
   };
 
@@ -479,7 +425,6 @@ const handleGuardarProducto = async () => {
                     <label>Precio Producto</label>
                     <input type="number" name="precio" placeholder="0.00" value={nuevoProducto.precio} onChange={handleInputChange} className={errores.precio ? 'input-error' : ''} min="0" step="0.01" />
                     {errores.precio && <span className="error-message">{errores.precio}</span>}
-<<<<<<< HEAD
                   </div>
                   <div className="form-group">
                     <label>Stock</label>
@@ -489,20 +434,6 @@ const handleGuardarProducto = async () => {
                   <div className="form-group">
                     <label>Código</label>
                     <input type="text" name="codigo" placeholder="Ingrese código del producto" value={nuevoProducto.codigo} onChange={handleInputChange} className={errores.codigo ? 'input-error' : ''} />
-=======
-                  </div>                  <div className="form-group">
-                    <label>Código</label>
-                    <input
-                      type="text"
-                      name="codigo"
-                      placeholder="Ingrese código del producto"
-                      value={nuevoProducto.codigo}
-                      onChange={handleInputChange}
-                      className={errores.codigo ? 'input-error' : ''}
-                      disabled={editandoProducto}
-                    />
->>>>>>> d6c53f20dccef9231f2b50a47bfc9e5f0499df9d
-                    {errores.codigo && <span className="error-message">{errores.codigo}</span>}
                   </div>
                 </div>
               </div>              <div className="modal-buttons">
@@ -594,13 +525,8 @@ const handleGuardarProducto = async () => {
                   <span className="flecha-back">←</span> Volver
                 </button>
                 <div>
-<<<<<<< HEAD
-                  <button className="btn-eliminar" onClick={handleDeleteProduct}>Eliminar</button>
-                  <button className="btn-editar" onClick={handleEditClick}>Editar</button>
-=======
                   <button className="btn-eliminar" onClick={handleEliminarProducto}>Eliminar</button>
                   <button className="btn-editar" onClick={handleEditarClick}>Editar</button>
->>>>>>> d6c53f20dccef9231f2b50a47bfc9e5f0499df9d
                 </div>
                 {isEditing && <button className="btn-guardar" onClick={handleSaveEditedProduct}>Guardar Producto</button>}
               </div>
