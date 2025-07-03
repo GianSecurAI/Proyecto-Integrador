@@ -87,6 +87,21 @@
         	<version>5.2.5</version>
     	</dependency>
 
+		<!-- Dependencias para el test -->
+		<!-- Selenium Java -->
+		<dependency>
+    		<groupId>org.seleniumhq.selenium</groupId>
+    		<artifactId>selenium-java</artifactId>
+    		<version>4.20.0</version> <!-- Usa la última versión estable -->
+		</dependency>
+
+		<!-- WebDriver Manager para gestionar drivers automáticamente -->
+		<dependency>
+    		<groupId>io.github.bonigarcia</groupId>
+		    <artifactId>webdrivermanager</artifactId>
+    		<version>5.8.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
