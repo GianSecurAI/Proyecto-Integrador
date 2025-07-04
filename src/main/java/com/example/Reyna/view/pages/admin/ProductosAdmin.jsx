@@ -32,8 +32,6 @@ const ProductosAdmin = () => {
     codigo: ''
   });
   const [productoEncontrado, setProductoEncontrado] = useState(null);
-  const [editandoProducto, setEditandoProducto] = useState(false);
-  const [productoEditando, setProductoEditando] = useState(null);
 
   const categorias = ['Todos', 'Damas', 'Caballeros', 'Niños', 'Unisex'];
   const marcas = ['Dior', 'Carolina Herrera', 'Lancôme', 'MAC', 'L\'Oreal', 'Maybelline'];
@@ -100,8 +98,6 @@ const ProductosAdmin = () => {
   };
   const handleCancelarClick = () => {
     setMostrarModal(false);
-    setEditandoProducto(false);
-    setProductoEditando(null);
     setNuevoProducto({
       nombre: '', categoria: '', marca: '', precio: '',
       codigo: '', contenido: '', descripcion: '', stock: ''
@@ -198,6 +194,12 @@ const ProductosAdmin = () => {
 
   const handleSaveEditedProduct = async () => {
     if (!productoEncontrado) return;
+
+    if (!productoEncontrado.nombre.trim() || !productoEncontrado.precio || Number(productoEncontrado.precio) <= 0 || !productoEncontrado.stock || Number(productoEncontrado.stock) < 0) {
+      alert('Por favor, complete todos los campos requeridos. El precio y el stock deben ser números válidos.');
+      return;
+    }
+
     const categoriaId = categorias.indexOf(productoEncontrado.categoria);
     const productoParaActualizar = {
       nombre_producto: productoEncontrado.nombre,
@@ -263,111 +265,6 @@ const ProductosAdmin = () => {
     saveAs(blob, 'productos.xlsx');
   };
 
-  const handleEditarClick = () => {
-    // Cargar los datos del producto encontrado en el formulario
-    if (productoEncontrado) {
-      setNuevoProducto({
-        nombre: productoEncontrado.nombre,
-        categoria: productoEncontrado.categoria,
-        marca: productoEncontrado.marca || '',
-        sexo: productoEncontrado.sexo || '',
-        precio: productoEncontrado.precio.toString(),
-        codigo: productoEncontrado.id
-      });
-      setEditandoProducto(true);
-      setProductoEditando(productoEncontrado.id);
-      setMostrarModalResultado(false);
-      setMostrarModal(true);
-    }
-  };
-
-  const handleActualizarProducto = async () => {
-    if (validarFormularioEdicion()) {
-      try {
-        // En un entorno real, esta sería una llamada API
-        // Por ahora trabajaremos solo con el estado local
-        const productoActualizado = {
-          id: productoEditando,
-          nombre: nuevoProducto.nombre,
-          categoria: nuevoProducto.categoria,
-          marca: nuevoProducto.marca,
-          sexo: nuevoProducto.sexo,
-          precio: Number(nuevoProducto.precio)
-        };
-        
-        // Actualizar el estado de productos
-        setProductos(prevProductos => 
-          prevProductos.map(p => p.id === productoEditando ? productoActualizado : p)
-        );
-        
-        // Cerrar el modal y limpiar formulario
-        setMostrarModal(false);
-        setEditandoProducto(false);
-        setProductoEditando(null);
-        setNuevoProducto({
-          nombre: '',
-          categoria: '',
-          marca: '',
-          sexo: '',
-          precio: '',
-          codigo: ''
-        });
-        setErrores({});
-        
-        // Mostrar mensaje de éxito
-        alert('Producto actualizado con éxito');
-      } catch (error) {
-        alert('No se pudo actualizar el producto');
-      }
-    }
-  };
-
-  const validarFormularioEdicion = () => {
-    const nuevosErrores = {};
-    
-    if (!nuevoProducto.nombre.trim()) {
-      nuevosErrores.nombre = 'El nombre es requerido';
-    }
-    
-    if (!nuevoProducto.categoria) {
-      nuevosErrores.categoria = 'La categoría es requerida';
-    }
-    
-    if (!nuevoProducto.marca) {
-      nuevosErrores.marca = 'La marca es requerida';
-    }
-    
-    if (!nuevoProducto.precio || nuevoProducto.precio <= 0) {
-      nuevosErrores.precio = 'El precio debe ser mayor a 0';
-    }
-    
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
-  };
-  const handleEliminarProducto = () => {
-    if (productoEncontrado && window.confirm('¿Está seguro que desea eliminar este producto?')) {
-      try {
-        // En un entorno real, esta sería una llamada API
-        // Por ahora trabajaremos solo con el estado local
-        setProductos(prevProductos => 
-          prevProductos.filter(p => p.id !== productoEncontrado.id)
-        );
-        
-        // Cerrar el modal y limpiar formulario
-        setMostrarModalResultado(false);
-        setProductoEncontrado(null);
-        setBusquedaProducto({
-          categoria: '',
-          codigo: ''
-        });
-        
-        // Mostrar mensaje de éxito
-        alert('Producto eliminado con éxito');
-      } catch (error) {
-        alert('No se pudo eliminar el producto');
-      }
-    }
-  };
   return (
     <div className="page-container-for-fixed-nav">
       <Navbar />
@@ -385,7 +282,7 @@ const ProductosAdmin = () => {
         {/* Modal de Nuevo Producto */}
         {mostrarModal && (
           <div className="modal-overlay">
-            <div className="modal-content">              <h2>{editandoProducto ? 'Editar Producto' : 'Nuevo Producto'}</h2>
+            <div className="modal-content">              <h2>Nuevo Producto</h2>
               <hr className="divisor" />
               <div className="form-grid">
                 <div className="form-column">
@@ -410,20 +307,20 @@ const ProductosAdmin = () => {
                     </select>
                     {errores.marca && <span className="error-message">{errores.marca}</span>}
                   </div>
-                </div>
-                {/* Campos de Contenido y Descripción para Nuevo Producto */}
-                <div className="form-group">
-                  <label>Contenido</label>
-                  <input type="text" name="contenido" placeholder="Ej: 100ml" value={nuevoProducto.contenido || ''} onChange={handleInputChange} />
-                </div>
-                <div className="form-group">
-                  <label>Descripción</label>
-                  <input type="text" name="descripcion" placeholder="Descripción del producto" value={nuevoProducto.descripcion || ''} onChange={handleInputChange} />
+                  {/* Campos de Contenido y Descripción para Nuevo Producto */}
+                  <div className="form-group">
+                    <label>Contenido</label>
+                    <input type="text" name="contenido" placeholder="Ej: 100ml" value={nuevoProducto.contenido || ''} onChange={handleInputChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>Descripción</label>
+                    <input type="text" name="descripcion" placeholder="Descripción del producto" value={nuevoProducto.descripcion || ''} onChange={handleInputChange} />
+                  </div>
                 </div>
                 <div className="form-column">
                   <div className="form-group">
                     <label>Precio Producto</label>
-                    <input type="number" name="precio" placeholder="0.00" value={nuevoProducto.precio} onChange={handleInputChange} className={errores.precio ? 'input-error' : ''} min="0" step="0.01" />
+                    <input type="number" name="precio" placeholder="0.00" value={nuevoProducto.precio || ''} onChange={handleInputChange} className={errores.precio ? 'input-error' : ''} min="0" step="0.01" />
                     {errores.precio && <span className="error-message">{errores.precio}</span>}
                   </div>
                   <div className="form-group">
@@ -433,16 +330,14 @@ const ProductosAdmin = () => {
                   </div>
                   <div className="form-group">
                     <label>Código</label>
-                    <input type="text" name="codigo" placeholder="Ingrese código del producto" value={nuevoProducto.codigo} onChange={handleInputChange} className={errores.codigo ? 'input-error' : ''} />
+                    <input type="text" name="codigo" placeholder="Ingrese código del producto" value={nuevoProducto.codigo || ''} onChange={handleInputChange} className={errores.codigo ? 'input-error' : ''} />
+                    {errores.codigo && <span className="error-message">{errores.codigo}</span>}
                   </div>
                 </div>
               </div>              <div className="modal-buttons">
                 <button onClick={handleCancelarClick} className="btn-cancelar">Cancelar</button>
-                <button 
-                  onClick={editandoProducto ? handleActualizarProducto : handleGuardarProducto} 
-                  className="btn-guardar"
-                >
-                  {editandoProducto ? 'Actualizar' : 'Guardar'}
+                <button onClick={handleGuardarProducto} className="btn-guardar">
+                  Guardar
                 </button>
               </div>
             </div>
@@ -525,8 +420,8 @@ const ProductosAdmin = () => {
                   <span className="flecha-back">←</span> Volver
                 </button>
                 <div>
-                  <button className="btn-eliminar" onClick={handleEliminarProducto}>Eliminar</button>
-                  <button className="btn-editar" onClick={handleEditarClick}>Editar</button>
+                  <button className="btn-eliminar" onClick={handleDeleteProduct}>Eliminar</button>
+                  <button className="btn-editar" onClick={handleEditClick}>Editar</button>
                 </div>
                 {isEditing && <button className="btn-guardar" onClick={handleSaveEditedProduct}>Guardar Producto</button>}
               </div>

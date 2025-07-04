@@ -8,7 +8,8 @@ CREATE TABLE Rol (
 -- Tabla de usuarios
 CREATE TABLE Usuario (
     id_usuario BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nombre_completo VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
     correo VARCHAR(100) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),

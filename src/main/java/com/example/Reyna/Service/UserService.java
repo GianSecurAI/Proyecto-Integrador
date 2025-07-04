@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,27 +29,20 @@ public class UserService {
     // Se realiza una conversión a intValue(). Asegúrate de que los IDs no excedan el rango de Integer.
         return userRepository.findById(id).orElse(null);
     }
+    public Optional<User> findByCorreo(String correo) {
+        return userRepository.findByCorreo(correo);
+    }
+       public User updateUser(Long id, User userDetails) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
 
-     public User updateUser(Long id, User userDetails) {
-         User existingUser = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
-
-        existingUser.setNombre(userDetails.getNombre()); // Actualizar nombre
-        existingUser.setApellido(userDetails.getApellido()); // Actualizar apellido
+        // Un administrador solo debe actualizar estos campos específicos para un cliente.
+        // Esto evita cambiar accidentalmente la contraseña, el rol o el estado.
+        existingUser.setNombre(userDetails.getNombre());
+        existingUser.setApellido(userDetails.getApellido());
         existingUser.setCorreo(userDetails.getCorreo());
-        // Solo actualiza la contraseña si se proporciona y no está vacía
-        if (userDetails.getContraseña() != null && !userDetails.getContraseña().isEmpty()) {
-            existingUser.setContraseña(passwordEncoder.encode(userDetails.getContraseña()));
-        }
-        existingUser.setTelefono(userDetails.getTelefono()); // Corregido: No hay isEnabled() en User
+        existingUser.setTelefono(userDetails.getTelefono());
         existingUser.setDireccion(userDetails.getDireccion());
-        existingUser.setEstado(userDetails.isEnabled());
-        // Opcionalmente, actualiza el rol si userDetails lo contiene y está permitido
-        if (userDetails.getRol() != null && userDetails.getRol().getId_rol() != null) {
-            Rol newRol = rolRepository.findById(userDetails.getRol().getId_rol())
-            .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
-            existingUser.setRol(newRol);
-        }
 
         return userRepository.save(existingUser);
     }
@@ -64,13 +58,33 @@ public class UserService {
     public List<User> searchClients(String query) {
         Rol clientRole = rolRepository.findById(3L) // Asumiendo que el ID del rol CLIENTE es 3
                 .orElseThrow(() -> new RuntimeException("Rol con ID 3 (CLIENTE) no encontrado"));
+       if (query == null || query.trim().isEmpty()) {
+            return userRepository.findAll().stream()
+                    .filter(user -> user.getRol() != null && user.getRol().equals(clientRole))
+                    .collect(Collectors.toList());
+        }
+
+        // Verificamos si la consulta es un número para buscar por ID (código).
+        if (query.matches("\\d+")) {
+            try {
+                Long userId = Long.parseLong(query);
+                return userRepository.findById(userId)
+                        .filter(user -> user.getRol() != null && user.getRol().equals(clientRole)) // Aseguramos que el ID corresponda a un cliente.
+                        .map(List::of) // Convertimos el Optional<User> a una lista.
+                        .orElse(List.of()); // Si no se encuentra, devolvemos una lista vacía.
+            } catch (NumberFormatException e) {
+                return List.of(); // Si no es un Long válido, no es un ID.
+            }
+        }
+
+        // Si no es un número, realizamos la búsqueda por texto.
+        String lowerCaseQuery = query.toLowerCase();
         return userRepository.findAll().stream()
                 .filter(user -> user.getRol() != null && user.getRol().equals(clientRole) &&
-                        (query == null || query.trim().isEmpty() ||
-                        user.getNombre().toLowerCase().contains(query.toLowerCase()) || // Buscar por nombre
-                        user.getApellido().toLowerCase().contains(query.toLowerCase()) || // Buscar por apellido
-                         user.getCorreo().toLowerCase().contains(query.toLowerCase()) ||
-                         (user.getTelefono() != null && user.getTelefono().toLowerCase().contains(query.toLowerCase()))))
+                        (user.getNombre().toLowerCase().contains(lowerCaseQuery) ||
+                        user.getApellido().toLowerCase().contains(lowerCaseQuery) ||
+                        user.getCorreo().toLowerCase().contains(lowerCaseQuery) ||
+                        (user.getTelefono() != null && user.getTelefono().contains(lowerCaseQuery))))
                 .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/Checkout.css';
+import apiClient from '../../api/apiClient';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -15,10 +16,12 @@ const CheckoutPage = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('tienda');
   const [successModal, setSuccessModal] = useState(false);
+  const [loading, setLoading] = useState(true); // Estado para la carga de datos
   
   // Datos del usuario
   const [userData, setUserData] = useState({
-    nombreCompleto: '',
+    nombre: '',
+    apellido: '',
     correo: '',
     telefono: '',
     direccion: ''
@@ -30,35 +33,60 @@ const CheckoutPage = () => {
   // Cargar los productos del carrito y los datos del usuario desde el backend al montar el componente
   useEffect(() => {
     const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      const parsedCart = JSON.parse(storedCart);
-      setCartItems(parsedCart);
-      calculateTotals(parsedCart);
-    } else {
+    // Primero, valida el carrito. Si está vacío, no tiene sentido continuar.
+    if (!storedCart || JSON.parse(storedCart).length === 0) {
+      alert('Tu carrito está vacío. Serás redirigido.');
       navigate('/carrito');
+      return; // Detiene la ejecución del efecto
     }
 
+    const parsedCart = JSON.parse(storedCart);
+    setCartItems(parsedCart);
+    calculateTotals(parsedCart);
+
     // Obtener datos del usuario autenticado
-    const id_user = localStorage.getItem('id_user');
-    if (id_user) {
-      fetch(`/admin/users/${id_user}`)
-        .then(res => res.json())
-        .then(user => {
-          console.log('Usuario recibido:', user); // Para depuración
-          setUserData({
-            nombreCompleto: user.nombre + ' ' + user.apellido,
-            correo: user.correo,
-            telefono: user.telefono,
-            direccion: user.direccion
-          });
-          setTempUserData({
-            nombreCompleto: user.nombre + ' ' + user.apellido,
-            correo: user.correo,
-            telefono: user.telefono,
-            direccion: user.direccion
-          });
-        });
+    const id_usuario = localStorage.getItem('id_usuario');
+    if (!id_usuario) {
+      setLoading(false); // No hay usuario, finaliza la carga
+      alert('Para continuar con la compra, por favor inicie sesión.');
+      navigate('/login');
+      return; // Detiene la ejecución del efecto
     }
+        apiClient(`/api/usuarios/me`).then(async response => {
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Error al leer la respuesta del servidor.' }));
+          throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(user => {
+        console.log('Usuario recibido:', user);
+        if (user && user.nombre) { // Una validación extra para asegurar que el objeto de usuario es válido
+            const currentUserData = {
+            nombre: user.nombre || '',
+            apellido: user.apellido || '',
+            correo: user.correo || '',
+            telefono: user.telefono || '',
+            direccion: user.direccion || ''
+          };
+        setUserData(currentUserData);
+        setTempUserData(currentUserData);
+        } else {
+          // Si el usuario no se encuentra o la respuesta no es la esperada
+          throw new Error('No se encontraron los datos del usuario.');
+        }
+      })
+      .catch(error => {
+        console.error("Error al obtener los datos del usuario:", error);
+              alert(`No se pudieron cargar sus datos: ${error.message}. Por favor, inicie sesión de nuevo.`);
+      localStorage.removeItem('token');
+      localStorage.removeItem('id_usuario');
+      navigate('/login');
+
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [navigate]);
 
   // Función para calcular subtotales y totales
@@ -87,10 +115,35 @@ const CheckoutPage = () => {
   };
   
   // Guardar cambios después de editar
-  const saveChanges = () => {
-    setUserData({...tempUserData});
-    setEditMode(false);
-    // En una aplicación real, aquí enviaríamos los cambios al backend
+  const saveChanges = async () => {
+    const id_usuario = localStorage.getItem('id_usuario');
+    if (!id_usuario) {
+      alert('No se puede guardar, no se ha identificado al usuario.');
+      return;
+    }
+
+    try {
+      // --- IMPORTANTE: CORRECCIÓN DE LA RUTA ---
+      // La ruta para actualizar también debe ser la de usuario, no la de admin.
+      // Usamos la nueva ruta '/api/usuarios/me'.
+      const response = await apiClient(`/api/usuarios/me`, {
+        method: 'PUT',
+        body: JSON.stringify(tempUserData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Error al leer la respuesta del servidor.' }));
+        throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+      }
+
+      const updatedUser = await response.json();
+      setUserData(updatedUser);
+      setEditMode(false);
+      alert('Información actualizada correctamente.');
+    } catch (error) {
+      console.error('Error al guardar los cambios:', error);
+      alert(`No se pudieron guardar los cambios: ${error.message}`);
+    }
   };
   
   // Abrir el modal de términos y condiciones
@@ -113,7 +166,16 @@ const CheckoutPage = () => {
   // Enviar el pedido
   const submitOrder = async () => {
     // Simulación de id_cliente (en una app real, obtén el id del usuario autenticado)
-    const id_cliente = 1; // Cambia esto por el id real del usuario logueado
+     const id_usuario = localStorage.getItem('id_usuario');
+
+    if (!id_usuario) {
+      alert('Error: No se ha identificado al usuario. Por favor, inicie sesión de nuevo.');
+      // O a la página de inicio de sesión que corresponda
+      return;
+    }
+
+    // El ID del cliente es el del usuario logueado
+    const id_cliente = parseInt(id_usuario, 10);
 
     // Construir el array de productos para el backend
     const productos = cartItems.map(item => ({
@@ -130,19 +192,20 @@ const CheckoutPage = () => {
     };
 
     try {
-      const response = await fetch('/api/pedidos', {
+      const response = await apiClient('/api/pedidos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pedido)
       });
       if (response.ok) {
         setSuccessModal(true);
         localStorage.removeItem('cart');
       } else {
-        alert('Error al enviar el pedido. Intenta nuevamente.');
+        const errorData = await response.json().catch(() => ({ message: 'Error al leer la respuesta del servidor.' }));
+        throw new Error(errorData.message || `Error del servidor: ${response.status}`);
       }
     } catch (error) {
-      alert('Error de conexión con el servidor.');
+      console.error("Error al enviar el pedido:", error);
+      alert(`Error al enviar el pedido: ${error.message}`);
     }
   };
   
@@ -169,12 +232,18 @@ const CheckoutPage = () => {
             <div className="user-info-section">
               <h3 className="user-info-title">Información del Cliente</h3>
               
-              {!editMode ? (
+              {loading ? (
+                <p>Cargando información del cliente...</p>
+              ) : !editMode ? (
                 // Modo visualización
                 <div>
                   <div className="user-info-field">
-                    <span className="user-info-label">Nombre completo:</span>
-                    <div className="user-info-value">{userData.nombreCompleto}</div>
+                    <span className="user-info-label">Nombre:</span>
+                    <div className="user-info-value">{userData.nombre}</div>
+                  </div>
+                  <div className="user-info-field">
+                    <span className="user-info-label">Apellido:</span>
+                    <div className="user-info-value">{userData.apellido}</div>
                   </div>
                   <div className="user-info-field">
                     <span className="user-info-label">Correo electrónico:</span>
@@ -199,11 +268,21 @@ const CheckoutPage = () => {
                 // Modo edición
                 <div>
                   <div className="user-info-field">
-                    <label className="user-info-label">Nombre completo:</label>
+                    <label className="user-info-label">Nombre:</label>
                     <input 
                       type="text" 
-                      name="nombreCompleto" 
-                      value={tempUserData.nombreCompleto} 
+                      name="nombre" 
+                      value={tempUserData.nombre} 
+                      onChange={handleInputChange} 
+                      className="edit-field" 
+                    />
+                  </div>
+                   <div className="user-info-field">
+                    <label className="user-info-label">Apellido:</label>
+                    <input 
+                      type="text" 
+                      name="apellido" 
+                      value={tempUserData.apellido} 
                       onChange={handleInputChange} 
                       className="edit-field" 
                     />
@@ -229,7 +308,7 @@ const CheckoutPage = () => {
                     />
                   </div>
                   <div className="user-info-field">
-                    <label className="user-info-label">Dirección de entrega:</label>
+                    <label className="user-info-label">Dirección:</label>
                     <input 
                       type="text" 
                       name="direccion" 

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/Carrito.css';
 
 const CarritoPage = () => {
+  const navigate = useNavigate();
   // Estado para almacenar los productos del carrito
   const [cartItems, setCartItems] = useState([]);
   const [promoCode, setPromoCode] = useState('');
@@ -18,16 +19,19 @@ const CarritoPage = () => {
     if (storedCart) {
       const parsedCart = JSON.parse(storedCart);
       setCartItems(parsedCart);
-      calculateTotals(parsedCart);
+      calculateTotals(parsedCart, discount); // Pasar el descuento actual
     }
-  }, []);
+  }, []); // Se ejecuta solo al montar
+
+  // Recalcular el total si el subtotal o el descuento cambian
+  useEffect(() => {
+    setTotal(subtotal - discount);
+  }, [subtotal, discount]);
 
   // Función para calcular subtotales y totales
   const calculateTotals = (items) => {
     const cartSubtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setSubtotal(cartSubtotal);
-    // Aplicar descuento si existe
-    setTotal(cartSubtotal - discount);
   };
 
   // Función para eliminar un producto del carrito
@@ -56,19 +60,29 @@ const CarritoPage = () => {
     // Por ahora, simulamos un descuento fijo de S/ 10.00 con el código "PROMO10"
     if (promoCode.toUpperCase() === 'PROMO10') {
       const discountAmount = 10;
-      setDiscount(discountAmount);
-      setTotal(subtotal - discountAmount);
+      setDiscount(discountAmount); // Esto activará el useEffect para recalcular el total
       alert('¡Código promocional aplicado con éxito!');
     } else {
       alert('Código promocional inválido');
-      setDiscount(0);
-      setTotal(subtotal);
+      setDiscount(0); // Esto también activará el useEffect
     }
   };
 
   // Función para formatear precios a formato peruano (S/ XX.XX)
   const formatPrice = (price) => {
     return `S/ ${price.toFixed(2)}`;
+  };
+
+  const handleCheckout = (e) => {
+    e.preventDefault();
+    const id_usuario = localStorage.getItem('id_usuario');
+    const token = localStorage.getItem('token');
+
+    if (id_usuario && token) {
+      navigate('/checkout');
+    } else {
+      alert('Para continuar con la compra, por favor inicie sesión.');
+    }
   };
 
   return (
@@ -96,7 +110,8 @@ const CarritoPage = () => {
                       <th></th>
                     </tr>
                   </thead>
-                  <tbody>                    {cartItems.map((item, index) => (
+                  <tbody>
+                    {cartItems.map((item, index) => (
                       <tr key={index} className="align-middle">
                         <td>
                           <div className="d-flex align-items-center">
@@ -164,9 +179,9 @@ const CarritoPage = () => {
                       <span>TOTAL:</span>
                       <span>{formatPrice(total)}</span>
                     </div>                    <div className="text-end mt-3">
-                      <Link to="/checkout" className="btn checkout-btn">
+                      <button onClick={handleCheckout} className="btn checkout-btn">
                         Comprar
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>

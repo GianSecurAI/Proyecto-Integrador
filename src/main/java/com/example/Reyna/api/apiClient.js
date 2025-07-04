@@ -1,23 +1,45 @@
-// apiClient.js
-const API_BASE_URL = 'http://localhost:8080'; // Asegúrate de que esta URL sea correcta para tu backend
+const apiClient = async (url, options = {}) => {
+  // Obtiene el token de autenticación desde localStorage.
+  // Asegúrate de que la clave 'token' sea la misma que usas al guardar el token en el login.
+  const token = localStorage.getItem('token');
 
-const apiClient = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token'); // Obtiene el token del almacenamiento local
-
+  // Configura las cabeceras por defecto.
   const headers = {
     'Content-Type': 'application/json',
-    ...options.headers, // Permite sobrescribir o añadir otros headers
+    ...options.headers,
   };
 
+  // Si existe un token, lo añade a la cabecera de autorización.
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`; // Añade el token JWT al encabezado de autorización
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const config = {
     ...options,
-    headers: headers,
-  });
-  return response;
+    headers,
+  };
+
+  // La URL base de tu API en el backend.
+  const baseUrl = 'http://localhost:8080';
+
+  try {
+    const response = await fetch(`${baseUrl}${url}`, config);
+
+    // Si el token es inválido o ha expirado (error 401 o 403),
+    // limpia el localStorage y redirige al login para evitar bucles.
+    if (response.status === 401 || response.status === 403) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('id_usuario');
+      window.location.href = '/login'; // Redirección forzada para limpiar el estado.
+      return new Promise(() => {}); // Detiene la ejecución posterior.
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Error de conexión con el API Client:', error);
+    alert('Error de conexión con el servidor. Por favor, intente más tarde.');
+    throw error;
+  }
 };
 
 export default apiClient;

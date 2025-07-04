@@ -1,7 +1,4 @@
 package com.example.Reyna.model;
-
-import com.example.Reyna.model.Rol;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

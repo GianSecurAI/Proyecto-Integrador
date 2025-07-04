@@ -38,9 +38,12 @@ public class SecurityConfig {
                         .requestMatchers("/admin/users/**").hasAuthority("ADMINISTRADOR") // Permite todas las operaciones CRUD para usuarios/clientes (incluye /admin/users/register-client si existiera)
                         // Endpoints para ADMINISTRADOR y VENDEDOR
                         .requestMatchers("/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
+                        // Endpoints para CLIENTES
+                        .requestMatchers("/api/pedidos/**").hasAuthority("CLIENTE")
+                        // Endpoints para CUALQUIER USUARIO AUTENTICADO (CLIENTE, VENDEDOR, ADMIN)
+                        .requestMatchers("/api/usuarios/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/ventas/**").hasAuthority("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/ventas/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
-                        .requestMatchers("/api/compras/**").hasAuthority("CLIENTE")
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManager -> sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider)

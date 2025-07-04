@@ -46,11 +46,14 @@ const Login = () => {
       // Para depurar, muestra en la consola la respuesta completa del backend
       console.log("Respuesta del backend:", JSON.stringify(data, null, 2));
       localStorage.setItem('user', JSON.stringify(data.data));
+      // --- SOLUCIÓN AL PROBLEMA DEL BUCLE ---
+      // El problema es que el ID del usuario no se estaba guardando correctamente.
+      // El backend envía 'id_usuario', pero el código buscaba 'id'.
       localStorage.setItem('token', data.token);
-      if (data.data && data.data.id) {
-        localStorage.setItem('id_user', data.data.id);
+      if (data.data && data.data.id_usuario) {
+        localStorage.setItem('id_usuario', data.data.id_usuario); // Se guarda como 'id_usuario'
       } else {
-        localStorage.removeItem('id_user');
+        localStorage.removeItem('id_usuario');
       }
       console.log("User data stored in localStorage:", data.data);
       alert(data.message);
