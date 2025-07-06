@@ -49,6 +49,7 @@ h2 {
 }
 
 .form-group {
+  position: relative;
   margin-bottom: 18px;
 }
 
@@ -64,14 +65,15 @@ h2 {
 .form-group input[type="text"],
 .form-group input[type="tel"] {
   width: 100%;
-  padding: 12px 38px 12px 14px;
-  /* padding-right aumentado para dejar espacio al botón */
+  padding: 12px 40px 12px 14px; /* padding-right aumentado para el botón */
   border: 1.5px solid #e0e0e0;
   border-radius: 7px;
   box-sizing: border-box;
   font-size: 1rem;
   background: #f7f8fa;
   transition: border 0.2s;
+  height: 44px; /* Asegura altura consistente */
+  line-height: 1.2;
 }
 
 .form-group input:focus {
@@ -82,9 +84,8 @@ h2 {
 
 .show-password-btn {
   position: absolute;
-  right: 10px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 14px;
   background: none;
   border: none;
   cursor: pointer;
@@ -92,11 +93,24 @@ h2 {
   font-size: 1.2em;
   padding: 0;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  width: 24px;
 }
 
 .show-password-btn:focus {
   outline: none;
-  color: #5cb85c;
+}
+
+.show-password-btn i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  width: 100%;
+  height: 100%;
 }
 
 .form-options {
@@ -107,7 +121,7 @@ h2 {
 }
 
 .btn-submit {
-  background: linear-gradient(90deg, #5cb85c 60%, #4cae4c 100%);
+  background: linear-gradient(90deg, #be3838 50%, #ac1414 100%);
   color: #fff;
   padding: 12px 28px;
   border: none;
@@ -120,14 +134,14 @@ h2 {
 }
 
 .btn-submit:hover {
-  background: linear-gradient(90deg, #4cae4c 60%, #5cb85c 100%);
+  background: linear-gradient(90deg, #ac1414 50%, #be3838 100%);
   box-shadow: 0 4px 16px 0 rgba(92,184,92,0.13);
 }
 
 .btn-link {
   background: none;
   border: none;
-  color: #5cb85c;
+  color: #ac1414;
   font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
@@ -136,7 +150,7 @@ h2 {
 }
 
 .btn-link:hover {
-  color: #388e3c;
+  color: #d64949;
   text-decoration: underline;
 }
 
@@ -149,7 +163,7 @@ h2 {
   display: block;
   text-align: center;
   margin-top: 10px;
-  color: #007bff;
+  color: #ac1414;
   text-decoration: none;
   font-size: 0.98rem;
 }
