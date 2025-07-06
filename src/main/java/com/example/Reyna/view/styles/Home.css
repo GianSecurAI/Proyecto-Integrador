@@ -28,13 +28,13 @@
   content: '';
   flex-grow: 1; /* Permite que las líneas ocupen el espacio disponible */
   height: 1px; /* Grosor de la línea */
-  background-color: #9d705d; /* Un tono marrón/terracota, similar a la imagen */
+  background-color: #97082c; /* Un tono marrón/terracota, similar a la imagen */
   margin: 0 20px; /* Espacio entre la línea y el texto del título */
 }
 
 .section-title {
   font-size: 1.2em; /* Tamaño más pequeño para móviles */
-  color: #9d705d;
+  color: #97082c;
   text-transform: uppercase;
   font-weight: 500;
   letter-spacing: 1px;
@@ -54,11 +54,4 @@
   }
 }
 
-/* Contenedor principal de la página Home */
-.home-container {
-  /* Si tu Navbar es fija y está cubriendo parte del contenido superior, 
-     podrías necesitar añadir un padding-top aquí.
-     Ejemplo: padding-top: 100px; 
-     Actualmente, parece que #banner-principal en tu Home.css ya tiene un margin-top,
-     lo que podría estar resolviendo esto. Verifica si es necesario. */
-}
+

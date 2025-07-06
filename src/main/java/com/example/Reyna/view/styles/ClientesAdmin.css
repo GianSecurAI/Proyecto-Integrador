@@ -37,12 +37,13 @@
 }
 
 .btn-agregar {
-  background-color: #28a745;
+  background-color: #97082c;
   color: white;
 }
 
 .btn-agregar:hover {
-  background-color: #218838;
+  background-color: #700621;
+  color: white;
   transform: translateY(-2px);
 }
 

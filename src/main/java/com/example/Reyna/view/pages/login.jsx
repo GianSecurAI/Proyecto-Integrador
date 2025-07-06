@@ -145,7 +145,7 @@ const Login = () => {
                   required
                 />
               </div>
-              <div className="form-group" style={{ position: 'relative' }}>
+              <div className="form-group">
                 <label htmlFor="login-password">Contraseña *</label>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -153,7 +153,6 @@ const Login = () => {
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
-                  style={{ paddingRight: '38px' }}
                 />
                 <button
                   type="button"
@@ -161,18 +160,6 @@ const Login = () => {
                   onClick={() => setShowPassword((prev) => !prev)}
                   tabIndex={-1}
                   aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#888',
-                    fontSize: '1.2em',
-                    padding: 0
-                  }}
                 >
                   <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                 </button>
@@ -232,7 +219,6 @@ const Login = () => {
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)}
                   required
-                  style={{ paddingRight: '38px' }}
                 />
                 <button
                   type="button"
@@ -240,18 +226,6 @@ const Login = () => {
                   onClick={() => setShowRegisterPassword((prev) => !prev)}
                   tabIndex={-1}
                   aria-label={showRegisterPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#888',
-                    fontSize: '1.2em',
-                    padding: 0
-                  }}
                 >
                   <i className={`bi ${showRegisterPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                 </button>

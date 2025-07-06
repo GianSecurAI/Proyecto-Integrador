@@ -78,7 +78,7 @@ const Navbar = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav mx-auto">
-            <li className="nav-item"><Link className="nav-link active" to="/">INICIO</Link></li>
+            <li className="nav-item"><Link className="nav-link" to="/">INICIO</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/productos">PRODUCTOS</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/nosotros">NOSOTROS</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/contacto">CONTACTO</Link></li>          
@@ -140,7 +140,11 @@ const Navbar = () => {
                         ))}
                       </div>
                       <div className="cart-panel-footer">
-                        <Link to="/carrito" className="btn btn-primary w-100" onClick={() => setShowCart(false)}>
+                        <Link
+                          to="/carrito"
+                          className="btn w-100 btn-cart-panel"
+                          onClick={() => setShowCart(false)}
+                        >
                           IR AL CARRITO
                         </Link>
                       </div>

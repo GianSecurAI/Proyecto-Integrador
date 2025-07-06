@@ -1,6 +1,6 @@
 .footer {
   background: #f8f3f7;
-  border-top: 1px solid #975e7f;
+  border-top: 1px solid #97082cb4;
   padding-top: 35px;
 }
 
@@ -9,11 +9,11 @@
 }
 
 .footer h6 {
-  color: #a05b8e;
+  color: #97082c;
 }
 
 .footer a {
-  color: #7d3c6e;
+  color: #a12443bd;
 }
 
 .footer a:hover {
@@ -21,11 +21,11 @@
 }
 
 .footer-contact {
-  color: #7d3c6e;
+  color: #a12443bd;
 }
 
 .footer-social-icons a {
-  color: #a05b8e;
+  color: #a12443bd;
   margin-left: 15px;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .footer-copyright {
-  color: #a05b8e;
+  color: #97082c;
 }
 
 /* Estilos para los modales */
