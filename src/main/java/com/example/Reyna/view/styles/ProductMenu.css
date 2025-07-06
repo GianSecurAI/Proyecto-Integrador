@@ -1,33 +1,32 @@
 /* src/styles/ProductMenu.css */
 .menu-perfumes {
-  background-color: #fceef5; /* Rosa muy pálido */
+  background-color: #ad08321a; /* Rosa muy pálido */
   padding: 20px;
   border-radius: 4px; /* Opcional: para bordes ligeramente redondeados */
 }
 
 .menu-perfumes h5 {
-  color: #6a0042; /* Morado oscuro/fucsia */
+  color: #97082c; /* Morado oscuro/fucsia */
   text-transform: uppercase;
   font-weight: bold;
   font-size: 1.1rem;
-  border-bottom: 2px solid #6a0042;
+  border-bottom: 2px solid #97082c;
   padding-bottom: 10px;
   margin-bottom: 15px;
 }
 
 .menu-perfumes .nav-link {
   padding: 0.3rem 0; /* Ajuste de padding vertical */
-  color: #6a0042; /* Color por defecto para links, se sobreescribirá */
   text-decoration: none;
 }
 
 .menu-perfumes .nav-link:hover {
-  color: #D91A7B; /* Rosa más brillante para el hover */
+  color: #97082ca2; 
 }
 
 .menu-perfumes .category-title {
   font-weight: bold;
-  color: #6a0042; /* Morado oscuro/fucsia */
+  color: #97082c; /* Morado oscuro/fucsia */
   margin-top: 0.5rem;
 }
 

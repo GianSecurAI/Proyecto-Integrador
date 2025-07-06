@@ -23,11 +23,10 @@ const ProductMenu = () => {
               console.log(`Filtrar por ${category.title}`);
             }}
             style={{
-              color: '#7B1E7A',
               padding: '10px 15px',
               textDecoration: 'none',
               display: 'block',
-              borderBottom: '1px solid #eee'
+              
             }}
           >
             ▸ {category.title}

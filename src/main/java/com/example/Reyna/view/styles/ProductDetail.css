@@ -1,5 +1,5 @@
 .volver-atras {
-  color: #D91A7B; /* Tono rosa/fucsia más vibrante */
+  color: #97082c; /* Tono rosa/fucsia más vibrante */
   text-decoration: none;
   font-weight: 500;
   display: inline-block;
@@ -32,7 +32,7 @@
 
 .col-md-7 .detalle-precio {
   font-size: 1.5rem; /* Más grande */
-  color: #D91A7B; /* Tono rosa/fucsia */
+  color: #97082c; /* Tono rosa/fucsia */
   font-weight: 700; /* Bold */
   margin-bottom: 1.5rem;
 }
@@ -53,18 +53,18 @@
 }
 
 .btn-cantidad {
-  background-color: #D91A7B; /* Tono rosa/fucsia */
+  background-color: #a82848; /* Tono rosa/fucsia */
   color: white;
   border: none;
   min-width: 38px; /* Asegurar que los botones +/- tengan buen tamaño */
 }
 
 .btn-cantidad:hover {
-  background-color: #b81568; /* Un tono más oscuro para el hover */
+  background-color: #a82848c0; /* Un tono más oscuro para el hover */
 }
 
 .btn-agregar {
-  background-color: #D91A7B; /* Tono rosa/fucsia */
+  background-color: #a82848; /* Tono rosa/fucsia */
   color: white;
   border: none;
   padding: 0.9rem 2.2rem; /* Ajustado para mayor altura y ancho adecuado */
@@ -75,7 +75,7 @@
 }
 
 .btn-agregar:hover {
-  background-color: #b81568; /* Un tono más oscuro para el hover */
+  background-color: #a82848c0; /* Un tono más oscuro para el hover */
 }
 
 /* Secciones de descripción e ingredientes */

@@ -38,7 +38,7 @@
 }
 
 .product-card-price {
-  color: #a05b8e;
+  color: #97082c;
   font-weight: bold;
   margin-top: 0.5rem;
   font-size: 1.1rem;
@@ -46,7 +46,7 @@
 }
 
 .product-card-btn {
-  background: #a05b8e;
+  background: #97082c;
   color: #fff;
   border: none;
   margin-top: 0.5rem;
@@ -58,7 +58,7 @@
 }
 
 .product-card-btn:hover {
-  background: #8a4c78;
+  background: #700621;
   color: #fff;
   transform: translateY(-2px);
 }
