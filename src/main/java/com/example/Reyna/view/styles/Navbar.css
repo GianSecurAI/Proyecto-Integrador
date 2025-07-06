@@ -1,9 +1,17 @@
+.nav-link {
+  color: #333;
+}
+
+.nav-link:hover {
+  color: #97082c;
+}
+
 .navbar-link {
   color: #333;
 }
 
 .navbar-link:hover {
-  color: #555;
+  color: #97082c;
 }
 
 .navbar-brand img {
@@ -56,8 +64,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  background-color: #e9baba;
-  color: #333;
+  background-color: #e0a5a5;
+  color: #97082c;
 }
 
 .cart-panel-header h5 {
@@ -70,7 +78,7 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #333;
+  color: #97082c;
 }
 
 .cart-panel-body {
