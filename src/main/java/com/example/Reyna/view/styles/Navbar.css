@@ -64,8 +64,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  background-color: #e0a5a5;
-  color: #97082c;
+  background-color: #97082cd7;
+  color: #ffffff;
 }
 
 .cart-panel-header h5 {
@@ -78,7 +78,7 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #97082c;
+  color: #ffffff;
 }
 
 .cart-panel-body {
@@ -139,4 +139,18 @@
 .empty-cart-message p {
   margin-bottom: 15px;
   color: #666;
+}
+
+/* Estilos para el botón 'IR AL CARRITO' */
+.btn-cart-panel {
+  background: #b83254e3;
+  color: #fff;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-cart-panel:hover,
+.btn-cart-panel:focus {
+  background: #97082c94;
+  color: #fff;
 }

@@ -140,7 +140,11 @@ const Navbar = () => {
                         ))}
                       </div>
                       <div className="cart-panel-footer">
-                        <Link to="/carrito" className="btn btn-primary w-100" onClick={() => setShowCart(false)}>
+                        <Link
+                          to="/carrito"
+                          className="btn w-100 btn-cart-panel"
+                          onClick={() => setShowCart(false)}
+                        >
                           IR AL CARRITO
                         </Link>
                       </div>
