@@ -6,6 +6,7 @@ import com.example.Reyna.dao.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductoServiceImpl implements ProductoService 
@@ -18,6 +19,11 @@ public class ProductoServiceImpl implements ProductoService
     public List<Producto> obtenerTodos() 
     {
         return productoRepository.findAll();
+    }
+    @Override
+    public Optional<Producto> obtenerProductoPorId(Long id) {
+        // El repositorio ya devuelve un Optional, simplemente lo retornamos.
+        return productoRepository.findById(id);
     }
     @Override
     public Producto guardarProducto(Producto producto) {

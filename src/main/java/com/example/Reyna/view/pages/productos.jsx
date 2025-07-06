@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
@@ -21,109 +21,62 @@ import fondoImg from '../../../../../../../assets/img/fondo.png';
 import '../styles/Productos.css'; // Importar el CSS para la página de productos
 
 const ProductsPage = () => {
-  const [currentPage, setCurrentPage] = React.useState(1);
-  
-  // Lista de todos los productos disponibles
-  const allProducts = [
-    // Página 1
-    {
-      id: 1,
-      image: prodFrag1Img,
-      name: "Set Ccori Rosé: Parfum + Loción Perfumada",
-      price: "S/ 119.00",
-      link: "/producto/ccori-rose"
-    },
-    {
-      id: 2,
-      image: prodFrag2Img,
-      name: "Cielo en Rosa Eau de Parfum",
-      price: "S/ 113.00",
-      link: "/producto/cielo-rosa"
-    },
-    {
-      id: 3,
-      image: prodFrag3Img,
-      name: "Set Sauvage Dior: Parfum + Estuche Elegante",
-      price: "S/ 105.00",
-      link: "/producto/sauvage-dior"
-    },
-    {
-      id: 4,
-      image: prodFrag6Img,
-      name: "Bombshell Seduction Eau de Parfum",
-      price: "S/ 180.00",
-      link: "/producto/prod-frag6"
-    },
-    {
-      id: 5,
-      image: prodFrag5Img,
-      name: "Una Instinct Eau de Parfum",
-      price: "S/ 165.00",
-      link: "/producto/prod-frag5"
-    },
-    {
-      id: 6,
-      image: prodFrag4Img,
-      name: "Fragancia Intensa para Hombre",
-      price: "S/ 150.00",
-      link: "/producto/prod-frag4"
-    },
-    // Página 2
-    {
-      id: 7,
-      image: prodFrag7Img,
-      name: "Euforia Floral Collection",
-      price: "S/ 145.00",
-      link: "/producto/euforia-floral"
-    },
-    {
-      id: 8,
-      image: prodFrag8Img,
-      name: "Set Elegance: Perfume + Body Lotion",
-      price: "S/ 135.00",
-      link: "/producto/elegance-set"
-    },
-    {
-      id: 9,
-      image: prodFrag9Img,
-      name: "Midnight Dreams Eau de Parfum",
-      price: "S/ 190.00",
-      link: "/producto/midnight-dreams"
-    },
-    {
-      id: 10,
-      image: prodFrag10Img,
-      name: "Sweet Garden Collection",
-      price: "S/ 170.00",
-      link: "/producto/sweet-garden"
-    },
-    {
-      id: 11,
-      image: prodFrag11Img,
-      name: "Ocean Breeze For Men",
-      price: "S/ 155.00",
-      link: "/producto/ocean-breeze"
-    },
-    {
-      id: 12,
-      image: prodFrag12Img,
-      name: "Diamond Rose Limited Edition",
-      price: "S/ 210.00",
-      link: "/producto/diamond-rose"
-    },
-  ];
-  
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Mapeo de imágenes (temporal hasta que las imágenes vengan de la API)
+  const productImages = {
+    'P001': prodFrag1Img,
+    'P002': prodFrag2Img,
+    'P003': prodFrag3Img,
+    'P004': prodFrag4Img,
+    // Agrega más mapeos si es necesario, usando el código de producto
+  };
+
+  useEffect(() => {
+    // Cargar todos los productos desde la API
+    fetch('/api/productos')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setAllProducts(data);
+        setFilteredProducts(data); // Inicialmente mostrar todos
+      })
+      .catch(error => {
+        console.error('Error al cargar productos:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    // Filtrar productos cuando cambia la categoría seleccionada
+    if (selectedCategory === null) {
+      setFilteredProducts(allProducts);
+    } else {
+      const filtered = allProducts.filter(
+        product => product.categoria.id_categoria === selectedCategory
+      );
+      setFilteredProducts(filtered);
+    }
+    setCurrentPage(1); // Resetear a la primera página con cada filtro
+  }, [selectedCategory, allProducts]);
+
   // Productos por página
   const productsPerPage = 6;
   
   // Calcular total de páginas
-  const totalPages = Math.ceil(allProducts.length / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   
   // Obtener los productos de la página actual
   const getCurrentPageProducts = () => {
     const startIndex = (currentPage - 1) * productsPerPage;
     const endIndex = startIndex + productsPerPage;
-    return allProducts.slice(startIndex, endIndex);
+    return filteredProducts.slice(startIndex, endIndex);
   };
   
   // Manejar cambio de página
@@ -134,7 +87,7 @@ const ProductsPage = () => {
   };
   
   return (
-    <div className="page-container-for-fixed-nav"> {/* Aplicada clase para el Navbar fijo */}
+    <div className="page-container-for-fixed-nav">
       <Navbar />
       {/* Header de Productos */}
       <section className="productos-header text-center py-5" 
@@ -154,19 +107,19 @@ const ProductsPage = () => {
         <div className="row">
           {/* Menú Lateral */}
           <aside className="col-lg-3">
-            <ProductMenu />
+            <ProductMenu onCategorySelect={setSelectedCategory} />
           </aside>
 
           {/* Productos */}
           <section className="col-lg-9">
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
               {getCurrentPageProducts().map((product) => (
-                <div key={product.id} className="col">
+                <div key={product.id_producto} className="col">
                   <ProductCard
-                    image={product.image}
-                    name={product.name}
-                    price={product.price}
-                    link={product.link}
+                    image={productImages[product.codigo] || prodFrag5Img} // Usa una imagen por defecto si no hay mapeo
+                    name={product.nombre_producto}
+                    price={`S/ ${product.precio.toFixed(2)}`}
+                    link={`/producto/${product.id_producto}`} // Enlace dinámico con el ID
                   />
                 </div>
               ))}

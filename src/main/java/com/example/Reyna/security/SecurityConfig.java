@@ -32,12 +32,18 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authRequest -> authRequest
                         // Endpoints públicos (sin autenticación)
+                        .requestMatchers("/", "/index.html", "/static/**", "/manifest.json", "/favicon.ico", "/*.png", "/*.jpg", "/*.jpeg", "/*.gif").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/productos/**", "/api/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
                         // Endpoints solo para ADMINISTRADOR
                         .requestMatchers(HttpMethod.POST, "/admin/register-usuario").hasAuthority("ADMINISTRADOR")
                         .requestMatchers("/admin/users/**").hasAuthority("ADMINISTRADOR") // Permite todas las operaciones CRUD para usuarios/clientes (incluye /admin/users/register-client si existiera)
                         // Endpoints para ADMINISTRADOR y VENDEDOR
-                        .requestMatchers("/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR")
+                        .requestMatchers(HttpMethod.POST, "/api/productos").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR") // <-- MODIFICADO: Protege solo la creación
+                        .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR") // <-- MODIFICADO: Protege solo la actualización
+                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasAnyAuthority("ADMINISTRADOR", "VENDEDOR") // <-- MODIFICADO: Protege solo el borrado
                         // Endpoints para CLIENTES
                         .requestMatchers("/api/pedidos/**").hasAuthority("CLIENTE")
                         // Endpoints para CUALQUIER USUARIO AUTENTICADO (CLIENTE, VENDEDOR, ADMIN)

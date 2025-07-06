@@ -37,6 +37,7 @@ public class Producto {
     @Column(name = "contenido")
     private String contenido;
 
-    @Column(name = "descripcion")
+    @Lob
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 }

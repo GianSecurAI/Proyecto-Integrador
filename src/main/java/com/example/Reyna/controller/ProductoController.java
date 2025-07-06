@@ -3,6 +3,7 @@ package com.example.Reyna.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional; // <-- AÑADIR ESTA IMPORTACIÓN
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,6 +29,18 @@ public class ProductoController {
     public List<Producto> getAllProductos() {
         return productoService.obtenerTodos();
     }
+
+    // MÉTODO AÑADIDO PARA OBTENER UN PRODUCTO POR ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
+        Optional<Producto> producto = productoService.obtenerProductoPorId(id);
+        if (producto.isPresent()) {
+            return ResponseEntity.ok(producto.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping
         public Producto crearProducto(@AuthenticationPrincipal User user, @RequestBody Producto producto) {
         System.out.println("Usuario autenticado: " + user.getCorreo() + ", Rol: " + user.getRol().getNombre());
