@@ -12,6 +12,8 @@ import CheckoutPage from './main/java/com/example/Reyna/view/pages/checkout.jsx'
 import Dashboard from './main/java/com/example/Reyna/view/pages/admin/Dashboard.jsx'; // Importar Dashboard
 import ProductosAdmin from './main/java/com/example/Reyna/view/pages/admin/ProductosAdmin.jsx'; // Importar ProductosAdmin
 import ClientesAdmin from './main/java/com/example/Reyna/view/pages/admin/ClientesAdmin.jsx'; // Importar ClientesAdmin
+import PagoYapePage from './main/java/com/example/Reyna/view/pages/pago.jsx';
+import ConfirmacionPagoPage from './main/java/com/example/Reyna/view/pages/confirmacion.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const App = () => {
@@ -30,7 +32,8 @@ const App = () => {
         <Route path="/admin/productos" element={<ProductosAdmin />} /> {/* Ruta para la administración de productos */}
         <Route path="/admin/clientes" element={<ClientesAdmin />} /> {/* Ruta para la administración de clientes */}
         <Route path="/admin/registrar-usuario" element={<RegistrarUsuario />} /> {/* Ruta para registrar un nuevo usuario */}
-        
+        <Route path="/pago" element={<PagoYapePage />} />
+        <Route path="/confirmacion" element={<ConfirmacionPagoPage />} />
       </Routes>
     </Router>
   );

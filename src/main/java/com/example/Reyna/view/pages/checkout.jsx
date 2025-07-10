@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/Checkout.css';
 import apiClient from '../../api/apiClient';
+import fondoImg from '../../../../../../../assets/img/fondo.png';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -219,7 +220,7 @@ const CheckoutPage = () => {
     <div className="page-container-for-fixed-nav">
       <Navbar />
       
-      <section className="checkout-header text-center">
+      <section className="checkout-header text-center" style={{ backgroundImage: `url(${fondoImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="container">
           <h1>CONFIRMACIÓN DE COMPRA</h1>
         </div>
@@ -410,9 +411,9 @@ const CheckoutPage = () => {
             <button 
               className="submit-order-btn" 
               disabled={!termsAccepted}
-              onClick={submitOrder}
+              onClick={() => navigate('/pago', { state: { total, userData, cartItems } })}
             >
-              Enviar Pedido
+              Continuar con el pago
             </button>
           </div>
         </div>
