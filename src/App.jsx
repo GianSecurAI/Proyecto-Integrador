@@ -14,6 +14,7 @@ import ProductosAdmin from './main/java/com/example/Reyna/view/pages/admin/Produ
 import ClientesAdmin from './main/java/com/example/Reyna/view/pages/admin/ClientesAdmin.jsx'; // Importar ClientesAdmin
 import PagoYapePage from './main/java/com/example/Reyna/view/pages/pago.jsx';
 import ConfirmacionPagoPage from './main/java/com/example/Reyna/view/pages/confirmacion.jsx';
+import BoletasAdmin from './main/java/com/example/Reyna/view/pages/admin/BoletasAdmin.jsx'; // Importar BoletasAdmin
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const App = () => {
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/admin/registrar-usuario" element={<RegistrarUsuario />} /> {/* Ruta para registrar un nuevo usuario */}
         <Route path="/pago" element={<PagoYapePage />} />
         <Route path="/confirmacion" element={<ConfirmacionPagoPage />} />
+        <Route path="/admin/boletas/buscar" element={<BoletasAdmin />} /> {/* Ruta para buscar boletas por fecha o código */}
       </Routes>
     </Router>
   );
