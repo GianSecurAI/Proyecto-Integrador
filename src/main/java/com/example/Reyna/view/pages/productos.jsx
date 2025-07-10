@@ -32,6 +32,14 @@ const ProductsPage = () => {
     'P002': prodFrag2Img,
     'P003': prodFrag3Img,
     'P004': prodFrag4Img,
+    'P005': prodFrag5Img,
+    'P006': prodFrag6Img,
+    'P007': prodFrag7Img,
+    'P008': prodFrag8Img,
+    'P009': prodFrag9Img,
+    'P010': prodFrag10Img,
+    'P011': prodFrag11Img,
+    'P012': prodFrag12Img,
     // Agrega más mapeos si es necesario, usando el código de producto
   };
 
