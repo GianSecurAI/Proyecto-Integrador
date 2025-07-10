@@ -15,6 +15,7 @@ import ClientesAdmin from './main/java/com/example/Reyna/view/pages/admin/Client
 import PagoYapePage from './main/java/com/example/Reyna/view/pages/pago.jsx';
 import ConfirmacionPagoPage from './main/java/com/example/Reyna/view/pages/confirmacion.jsx';
 import BoletasAdmin from './main/java/com/example/Reyna/view/pages/admin/BoletasAdmin.jsx'; // Importar BoletasAdmin
+import FacturasAdmin from './main/java/com/example/Reyna/view/pages/admin/FacturasAdmin.jsx'; // Importar FacturasAdmin
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const App = () => {
@@ -36,6 +37,7 @@ const App = () => {
         <Route path="/pago" element={<PagoYapePage />} />
         <Route path="/confirmacion" element={<ConfirmacionPagoPage />} />
         <Route path="/admin/boletas/buscar" element={<BoletasAdmin />} /> {/* Ruta para buscar boletas por fecha o código */}
+        <Route path="/admin/facturas/buscar" element={<FacturasAdmin />} />
       </Routes>
     </Router>
   );

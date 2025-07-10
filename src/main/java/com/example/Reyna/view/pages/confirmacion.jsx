@@ -56,15 +56,30 @@ const ConfirmacionPagoPage = () => {
     console.log('Productos completos:', productos);
 
     try {
-        // Enviar solicitud al backend para guardar la información de la boleta
-        const response = await fetch(`/api/boletas/guardar?clienteId=${clienteId}`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(productosIds)
-        });
+        let response, codigoComprobante;
+        
+        // Determinar si es boleta o factura y hacer la solicitud correspondiente
+        if (tipoComprobante === 'factura') {
+            // Para facturas, necesitamos enviar también el RUC
+            response = await fetch(`/api/facturas/guardar?clienteId=${clienteId}&rucCliente=${ruc}`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(productosIds)
+            });
+        } else {
+            // Para boletas (comportamiento original)
+            response = await fetch(`/api/boletas/guardar?clienteId=${clienteId}`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(productosIds)
+            });
+        }
 
         console.log('Response status:', response.status);
         console.log('Response headers:', response.headers);
@@ -72,13 +87,13 @@ const ConfirmacionPagoPage = () => {
         if (!response.ok) {
             const errorText = await response.text();
             console.log('Error response:', errorText);
-            throw new Error(`Error al guardar la información de la boleta: ${response.status} - ${errorText}`);
+            throw new Error(`Error al guardar la información de la ${tipoComprobante}: ${response.status} - ${errorText}`);
         }
 
         const responseText = await response.text();
-        const codigoBoleta = responseText.replace('Boleta guardada exitosamente con código: ', '').trim();
+        codigoComprobante = responseText.trim();
 
-        // Generar el PDF con el código de la boleta del backend
+        // Generar el PDF con el código del comprobante del backend
         let y = 15;
         doc.setFontSize(14);
         doc.text('***    PERFUMERÍA LA REYNA    ***', 15, y); y += 7;
@@ -88,13 +103,16 @@ const ConfirmacionPagoPage = () => {
         doc.text('Tel: +51 986 140 637                      |                      tienda@lareyna.com', 15, y); y += 7;
         doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
         doc.setFontSize(12);
-        doc.text('BOLETA DE VENTA', 70, y); y += 5;
+        doc.text(tipoComprobante === 'factura' ? 'FACTURA ELECTRÓNICA' : 'BOLETA DE VENTA ELECTRÓNICA', 70, y); y += 5;
         doc.setFontSize(10);
         doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 7;
-        doc.text(`N° de Boleta: ${codigoBoleta}          Fecha: ${fecha}          Hora: ${hora}`, 15, y); y += 7;
+        doc.text(`N° de ${tipoComprobante === 'factura' ? 'Factura Electrónica' : 'Boleta de Venta Electrónica'}: ${codigoComprobante}          Fecha: ${fecha}          Hora: ${hora}`, 15, y); y += 7;
         doc.text('Cliente:', 15, y); y += 5;
         doc.text(`Nombre: ${cliente.nombre || ''}`, 15, y); y += 5;
         doc.text(`Apellido: ${cliente.apellido || ''}`, 15, y); y += 5;
+        if (tipoComprobante === 'factura') {
+            doc.text(`RUC: ${ruc}`, 15, y); y += 5;
+        }
         doc.text(`Teléfono: ${cliente.telefono || ''}`, 15, y); y += 5;
         doc.text(`Correo: ${cliente.correo || ''}`, 15, y); y += 5;
         doc.text(`Dirección: ${cliente.direccion || ''}`, 15, y); y += 7;
@@ -112,12 +130,12 @@ const ConfirmacionPagoPage = () => {
         doc.text(`TOTAL:    S/.${total.toFixed(2)}`, 120, y); y += 7;
         doc.setFont(undefined, 'normal');
         doc.text('Método de Pago: Transferencia vía Yape', 15, y); y += 5;
-        doc.text(`Código de Pedido: ${codigoBoleta}`, 15, y); y += 7;
+        doc.text(`Código de ${tipoComprobante === 'factura' ? 'Factura' : 'Pedido'}: ${codigoComprobante}`, 15, y); y += 7;
         doc.setFontSize(11);
         doc.text('**Gracias por su compra. Será confirmada en breve por el equipo.**', 15, y);
 
         // Descargar PDF localmente
-        doc.save(`boleta-${codigoBoleta}.pdf`);
+        doc.save(`${tipoComprobante}-${codigoComprobante}.pdf`);
     } catch (error) {
         alert("Error: " + error.message);
     }
@@ -140,7 +158,7 @@ const ConfirmacionPagoPage = () => {
               <h3 className="mb-3">¡Tu pago está en proceso de confirmación!</h3>
               <p className="mb-4">Estamos validando tu comprobante. Te notificaremos por correo o WhatsApp cuando tu pago sea aprobado.</p>
               <div className="mb-3"><strong>Monto pagado:</strong> S/ {total.toFixed(2)}</div>
-              <div className="mb-3"><strong>Tipo de comprobante:</strong> {tipoComprobante === 'factura' ? 'Factura' : 'Boleta'}</div>
+              <div className="mb-3"><strong>Tipo de comprobante:</strong> {tipoComprobante === 'factura' ? 'Factura Electrónica' : 'Boleta de Venta Electrónica'}</div>
               {tipoComprobante === 'factura' && (
                 <div className="mb-3"><strong>RUC:</strong> {ruc}</div>
               )}
@@ -153,7 +171,7 @@ const ConfirmacionPagoPage = () => {
                     style={{ marginBottom: 16 }}
                     onClick={handleDownloadPDF}
                   >
-                    Descargar {tipoComprobante === 'factura' ? 'Factura' : 'Boleta'} (PDF)
+                    Descargar {tipoComprobante === 'factura' ? 'Factura Electrónica' : 'Boleta de Venta Electrónica'} (PDF)
                   </button>
                 </div>
               )}

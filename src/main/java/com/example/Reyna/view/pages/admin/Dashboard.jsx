@@ -25,12 +25,14 @@ const Dashboard = () => {
               >
                 <h3>Productos</h3>
               </div>
+
               <div 
                 className="dashboard-card maintenance"
                 onClick={() => navigate('/admin/clientes')}
               >
                 <h3>Clientes</h3>
               </div>
+
             </div>
           </div>
 
@@ -42,7 +44,14 @@ const Dashboard = () => {
                 className="dashboard-card sales"
                 onClick={() => navigate('/admin/boletas/buscar')}
               >
-                <h3>Boletas</h3>
+                <h3>Boletas de Venta Electrónica</h3>
+              </div>
+
+              <div 
+                className="dashboard-card sales"
+                onClick={() => navigate('/admin/facturas/buscar')}
+              >
+                <h3>Facturas Electrónicas</h3>
               </div>
             </div>
           </div>
