@@ -59,10 +59,10 @@ const BoletasAdmin = () => {
     doc.text('Tel: +51 986 140 637                      |                      tienda@lareyna.com', 15, y); y += 7;
     doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
     doc.setFontSize(12);
-    doc.text('BOLETA DE VENTA', 70, y); y += 5;
+    doc.text('BOLETA DE VENTA ELECTRÓNICA', 70, y); y += 5;
     doc.setFontSize(10);
     doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 7;
-    doc.text(`N° de Boleta: ${boleta.codigo}          Fecha: ${fecha}          Hora: ${hora}`, 15, y); y += 7;
+    doc.text(`N° de Boleta de Venta Electrónica: ${boleta.codigo}          Fecha: ${fecha}          Hora: ${hora}`, 15, y); y += 7;
     doc.text('Cliente:', 15, y); y += 5;
     doc.text(`Nombre: ${boleta.cliente?.nombre || ''}`, 15, y); y += 5;
     doc.text(`Apellido: ${boleta.cliente?.apellido || ''}`, 15, y); y += 5;
@@ -105,14 +105,14 @@ const BoletasAdmin = () => {
     <div className="page-container-for-fixed-nav">
       <Navbar />
       <div style={{ maxWidth: 400, margin: '40px auto', padding: 24, border: '1px solid #ccc', borderRadius: 8, background: '#fff' }}>
-        <h3 style={{ marginBottom: 20 }}>Buscar Boleta</h3>
+        <h3 style={{ marginBottom: 20 }}>Buscar Boleta de Venta Electrónica</h3>
         <form onSubmit={handleBuscar}>
           <div style={{ marginBottom: 16 }}>
             <label>Fecha de Venta</label><br />
             <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ width: '100%', padding: 6 }} />
           </div>
           <div style={{ marginBottom: 16 }}>
-            <label>Código de Venta</label><br />
+            <label>Código de Boleta de Venta Electrónica</label><br />
             <input 
               type="text" 
               value={codigo} 
@@ -136,11 +136,11 @@ const BoletasAdmin = () => {
                 <div style={{ fontSize: '10px', marginBottom: 10 }}>Tel: +51 986 140 637 | tienda@lareyna.com</div>
                 
                 <div style={{ borderTop: '1px solid #333', borderBottom: '1px solid #333', textAlign: 'center', fontWeight: 'bold', padding: '5px 0', marginBottom: 10 }}>
-                  BOLETA DE VENTA
+                  BOLETA DE VENTA ELECTRÓNICA
                 </div>
                 
                 <div style={{ marginBottom: 10 }}>
-                  <strong>N° de Boleta:</strong> {boleta.codigo} &nbsp;&nbsp;&nbsp;
+                  <strong>N° de Boleta de Venta Electrónica:</strong> {boleta.codigo} &nbsp;&nbsp;&nbsp;
                   <strong>Fecha:</strong> {new Date(boleta.fechaVenta).toLocaleDateString('es-PE')} &nbsp;&nbsp;&nbsp;
                   <strong>Hora:</strong> {new Date(boleta.fechaVenta).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
                 </div>

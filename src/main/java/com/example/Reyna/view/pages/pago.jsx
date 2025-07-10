@@ -70,10 +70,10 @@ const PagoYapePage = () => {
                   <label className="form-label">Tipo de comprobante:</label>
                   <div>
                     <label className="me-3">
-                      <input type="radio" value="boleta" checked={tipoComprobante === 'boleta'} onChange={handleTipoChange} /> Boleta
+                      <input type="radio" value="boleta" checked={tipoComprobante === 'boleta'} onChange={handleTipoChange} /> Boleta de Venta Electrónica
                     </label>
                     <label>
-                      <input type="radio" value="factura" checked={tipoComprobante === 'factura'} onChange={handleTipoChange} /> Factura
+                      <input type="radio" value="factura" checked={tipoComprobante === 'factura'} onChange={handleTipoChange} /> Factura Electrónica
                     </label>
                   </div>
                 </div>
