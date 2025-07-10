@@ -77,7 +77,7 @@ const CarritoPage = () => {
     e.preventDefault();
     const id_usuario = localStorage.getItem('id_usuario');
     const token = localStorage.getItem('token');
-
+    console.log('DEBUG - id_usuario:', id_usuario, 'token:', token);
     if (id_usuario && token) {
       navigate('/checkout');
     } else {

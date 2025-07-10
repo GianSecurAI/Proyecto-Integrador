@@ -40,7 +40,7 @@ const ContactoPage = () => {
                   <div className="card-body text-center py-4">
                     <i className="bi bi-envelope-fill display-4"></i>
                     <h5 className="card-title mt-3 mb-3">CORREO</h5>
-                    <p className="card-text">demo@lareyna.com</p>
+                    <p className="card-text">tienda@lareyna.com</p>
                   </div>
                 </div>
               </a>
@@ -52,7 +52,7 @@ const ContactoPage = () => {
                   <div className="card-body text-center py-4">
                     <i className="bi bi-whatsapp display-4"></i>
                     <h5 className="card-title mt-3 mb-3">WHATSAPP</h5>
-                    <p className="card-text">(+34) 947 002 963</p>
+                    <p className="card-text">(+51) 973 908 601</p>
                   </div>
                 </div>
               </a>
@@ -90,7 +90,7 @@ const ContactoPage = () => {
         <div className="row justify-content-center">
           <div className="col-md-0">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3902.7385441158094!2d-77.06346097931682!3d-11.99258466713817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105ce56884c7ee7%3A0x6d8c6b2207bef24a!2sMegaplaza!5e0!3m2!1ses-419!2spe!4v1746688856578!5m2!1ses-419!2spe"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d975.6354363323752!2d-77.07598562433225!3d-12.006178285597429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105cef3cc0c8e2f%3A0xbd9fd599cfab4942!2sLa%20Reyna!5e0!3m2!1ses-419!2spe!4v1752099672042!5m2!1ses-419!2spe"
               width="100%"
               height="400"
               allowFullScreen=""
