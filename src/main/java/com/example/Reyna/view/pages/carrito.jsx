@@ -105,7 +105,7 @@ const CarritoPage = () => {
                       <th>PRODUCTO</th>
                       <th>PRECIO</th>
                       <th>CANT.</th>
-                      <th>CON DESCU.</th>
+                      
                       <th>TOTAL</th>
                       <th></th>
                     </tr>
@@ -130,9 +130,7 @@ const CarritoPage = () => {
                             <button onClick={() => updateQuantity(index, item.quantity + 1)} className="btn btn-sm">+</button>
                           </div>
                         </td>
-                        <td className="text-center">
-                          {item.discountedPrice ? formatPrice(item.discountedPrice) : "S/ 0.00"}
-                        </td>
+                        
                         <td className="text-center">{formatPrice(item.price * item.quantity)}</td>
                         <td className="text-center">
                           <button onClick={() => removeItem(index)} className="btn btn-sm remove-btn">
@@ -147,21 +145,7 @@ const CarritoPage = () => {
 
               <div className="row mt-4">
                 <div className="col-md-6">
-                  <div className="promo-code-section">
-                    <h5>¿Tienes algún código promocional?</h5>
-                    <div className="input-group mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Ingresa tu código"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                      />
-                      <button onClick={applyPromoCode} className="btn btn-primary apply-btn">
-                        Aplicar
-                      </button>
-                    </div>
-                  </div>
+                  
                 </div>
                 <div className="col-md-6">
                   <div className="cart-totals">

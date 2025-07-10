@@ -53,7 +53,7 @@ const ClientesAdmin = () => {
           email: user.correo,
           direccion: user.direccion,
           celular: user.telefono, // Map telefono to celular
-          pedidos: 0, // Placeholder, as 'pedidos' is not in backend User model
+          
         };
       });
       setClientes(mappedClients);
@@ -233,7 +233,7 @@ const ClientesAdmin = () => {
           email: data.correo,
           direccion: data.direccion,
           celular: data.telefono,
-          pedidos: 0, // Placeholder
+          
         });
         setMostrarModalBusqueda(false);
         setMostrarModalResultado(true);
@@ -423,7 +423,7 @@ const ClientesAdmin = () => {
                   <th>E-mail</th>
                   <th>Dirección</th>
                   <th>Celular</th>
-                  <th>N° Pedidos</th>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -436,7 +436,7 @@ const ClientesAdmin = () => {
                       <td>{cliente.email}</td>
                       <td>{cliente.direccion}</td>
                       <td>{cliente.celular}</td>
-                      <td>{cliente.pedidos}</td>
+                      
                     </tr>
                   ))
                 ) : (

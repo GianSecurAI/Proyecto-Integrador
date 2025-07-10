@@ -40,9 +40,9 @@ const Dashboard = () => {
             <div className="dashboard-cards">
               <div 
                 className="dashboard-card sales"
-                onClick={() => navigate('/admin/boletas')}
+                onClick={() => navigate('/admin/boletas/buscar')}
               >
-                <h3>Boleta</h3>
+                <h3>Boletas</h3>
               </div>
             </div>
           </div>
