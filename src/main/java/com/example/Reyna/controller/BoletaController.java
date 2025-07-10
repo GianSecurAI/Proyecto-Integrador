@@ -1,7 +1,9 @@
 package com.example.Reyna.controller;
 
 import com.example.Reyna.model.Boleta;
+import com.example.Reyna.model.DetalleVenta;
 import com.example.Reyna.dao.BoletaRepository;
+import com.example.Reyna.dao.DetalleVentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.math.BigDecimal;
 import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,9 @@ public class BoletaController {
 
     @Autowired
     private BoletaRepository boletaRepository;
+
+    @Autowired
+    private DetalleVentaRepository detalleVentaRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -175,6 +181,20 @@ public class BoletaController {
             
             boleta = boletaRepository.save(boleta);
             logger.info("Boleta guardada exitosamente con ID: {}", boleta.getId());
+
+            // Crear y guardar los detalles de venta
+            for (Producto producto : productos) {
+                DetalleVenta detalle = new DetalleVenta();
+                detalle.setBoleta(boleta);
+                detalle.setProducto(producto);
+                detalle.setCantidad(1); // Por ahora asumimos cantidad 1, se puede mejorar después
+                detalle.setPrecioUnitario(BigDecimal.valueOf(producto.getPrecio()));
+                detalle.setSubtotal(BigDecimal.valueOf(producto.getPrecio()));
+                
+                detalleVentaRepository.save(detalle);
+                logger.info("Detalle de venta guardado: Producto ID={}, Cantidad={}, Precio={}", 
+                    producto.getId_producto(), detalle.getCantidad(), detalle.getPrecioUnitario());
+            }
 
             return ResponseEntity.ok(codigoBoleta); // Retornamos solo el código
         } catch (Exception e) {

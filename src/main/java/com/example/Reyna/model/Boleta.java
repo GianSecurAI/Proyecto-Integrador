@@ -2,8 +2,11 @@ package com.example.Reyna.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
 
 @Data
 @Entity
@@ -39,6 +42,11 @@ public class Boleta {
 
     @Column(name = "igv")
     private double igv;
+
+    // Relación con DetalleVenta - Un registro de boleta puede tener múltiples detalles
+    @OneToMany(mappedBy = "boleta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<DetalleVenta> detalles = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
