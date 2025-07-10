@@ -11,69 +11,117 @@ const ConfirmacionPagoPage = () => {
   const location = useLocation();
   const { total = 0, tipoComprobante = 'boleta', ruc = '' } = location.state || {};
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const now = new Date();
     const pad = n => n.toString().padStart(2, '0');
     const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
     const hora = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    // Número de boleta y código de pedido únicos (simples)
-    const boletaNum = Math.floor(100000 + Math.random() * 900000);
-    const pedidoCod = `PED-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${boletaNum}`;
 
-    // Datos del cliente (puedes adaptar los nombres de variables según tu estructura real)
+    // Datos del cliente y productos
     const cliente = location.state?.cliente || {};
-    // Productos del pedido
     const productos = location.state?.productos || [];
-    // Si no hay productos, no genera PDF
+    
+    console.log('Location state completo:', location.state);
+    console.log('Cliente desde location:', cliente);
+    
     if (!productos.length) {
-      alert('No se encontraron productos para la boleta.');
-      return;
+        alert('No se encontraron productos para la boleta.');
+        return;
     }
+
+    // Obtener ID del cliente: primero desde location.state, luego desde localStorage
+    let clienteId = cliente.id_usuario || localStorage.getItem('id_usuario');
+    
+    if (!clienteId) {
+        alert('No se encontró la información del cliente. Por favor, inicie sesión nuevamente.');
+        return;
+    }
+
+    // Convertir a número si viene como string del localStorage
+    clienteId = parseInt(clienteId, 10);
+
     // Calcular totales
     const subtotal = productos.reduce((sum, p) => sum + (p.price * p.quantity), 0) / 1.18;
     const igv = subtotal * 0.18;
     const total = subtotal + igv;
 
-    let y = 15;
-    doc.setFontSize(14);
-    doc.text('***    PERFUMERÍA LA REYNA    ***', 15, y); y += 7;
-    doc.setFontSize(10);
-    doc.text('RUC: 10097930223', 15, y); y += 5;
-    doc.text('Dirección: Av. Angelica Gamarra 1320, Los Olivos - Perú', 15, y); y += 5;
-    doc.text('Tel: +51 986 140 637                      |                      tienda@lareyna.com', 15, y); y += 7;
-    doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
-    doc.setFontSize(12);
-    doc.text('BOLETA DE VENTA', 70, y); y += 5;
-    doc.setFontSize(10);
-    doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 7;
-    doc.text(`N° de Boleta: ${boletaNum}          Fecha: ${fecha}          Hora: ${hora}`, 15, y); y += 7;
-    doc.text('Cliente:', 15, y); y += 5;
-    doc.text(`Nombre: ${cliente.nombre || ''}`, 15, y); y += 5;
-    doc.text(`Apellido: ${cliente.apellido || ''}`, 15, y); y += 5;
-    doc.text(`Teléfono: ${cliente.telefono || ''}`, 15, y); y += 5;
-    doc.text(`Correo: ${cliente.correo || ''}`, 15, y); y += 5;
-    doc.text(`Dirección: ${cliente.direccion || ''}`, 15, y); y += 7;
-    doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
-    doc.text('| Cant | Código  | Producto                       | P. Unit | Total |', 15, y); y += 5;
-    doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
-    // Productos
-    productos.forEach(p => {
-      doc.text(`|  ${p.quantity}   | ${p.codigo || p.id || ''}  | ${p.name.slice(0,22)} | S/.${p.price} | S/.${(p.price * p.quantity).toFixed(2)} |`, 15, y);
-      y += 5;
-    });
-    doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 6;
-    doc.text(`Subtotal:   S/.${subtotal.toFixed(2)}`, 120, y); y += 5;
-    doc.text(`IGV (18%):   S/.${igv.toFixed(2)}`, 120, y); y += 5;
-    doc.setFont(undefined, 'bold');
-    doc.text(`TOTAL:    S/.${total.toFixed(2)}`, 120, y); y += 7;
-    doc.setFont(undefined, 'normal');
-    doc.text('Método de Pago: Transferencia vía Yape', 15, y); y += 5;
-    doc.text(`Código de Pedido: ${pedidoCod}`, 15, y); y += 7;
-    doc.setFontSize(11);
-    doc.text('**Gracias por su compra. Será confirmada en breve por el equipo.**', 15, y);
-    doc.save(`boleta-${boletaNum}.pdf`);
-  };
+    // Preparar datos para el backend
+    const productosIds = productos.map(p => p.id_producto || p.id);
+
+    // Debug: Verificar los datos antes de enviar
+    console.log('Cliente ID:', clienteId);
+    console.log('Productos IDs:', productosIds);
+    console.log('Cliente completo:', cliente);
+    console.log('Productos completos:', productos);
+
+    try {
+        // Enviar solicitud al backend para guardar la información de la boleta
+        const response = await fetch(`/api/boletas/guardar?clienteId=${clienteId}`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(productosIds)
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.log('Error response:', errorText);
+            throw new Error(`Error al guardar la información de la boleta: ${response.status} - ${errorText}`);
+        }
+
+        const responseText = await response.text();
+        const codigoBoleta = responseText.replace('Boleta guardada exitosamente con código: ', '').trim();
+
+        // Generar el PDF con el código de la boleta del backend
+        let y = 15;
+        doc.setFontSize(14);
+        doc.text('***    PERFUMERÍA LA REYNA    ***', 15, y); y += 7;
+        doc.setFontSize(10);
+        doc.text('RUC: 10097930223', 15, y); y += 5;
+        doc.text('Dirección: Av. Angelica Gamarra 1320, Los Olivos - Perú', 15, y); y += 5;
+        doc.text('Tel: +51 986 140 637                      |                      tienda@lareyna.com', 15, y); y += 7;
+        doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
+        doc.setFontSize(12);
+        doc.text('BOLETA DE VENTA', 70, y); y += 5;
+        doc.setFontSize(10);
+        doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 7;
+        doc.text(`N° de Boleta: ${codigoBoleta}          Fecha: ${fecha}          Hora: ${hora}`, 15, y); y += 7;
+        doc.text('Cliente:', 15, y); y += 5;
+        doc.text(`Nombre: ${cliente.nombre || ''}`, 15, y); y += 5;
+        doc.text(`Apellido: ${cliente.apellido || ''}`, 15, y); y += 5;
+        doc.text(`Teléfono: ${cliente.telefono || ''}`, 15, y); y += 5;
+        doc.text(`Correo: ${cliente.correo || ''}`, 15, y); y += 5;
+        doc.text(`Dirección: ${cliente.direccion || ''}`, 15, y); y += 7;
+        doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
+        doc.text('| Cant  | Producto                       | P. Unit | Total |', 15, y); y += 5;
+        doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 5;
+        productos.forEach(p => {
+            doc.text(`|  ${p.quantity}   | ${p.name.slice(0,22)} | S/.${p.price} | S/.${(p.price * p.quantity).toFixed(2)} |`, 15, y);
+            y += 5;
+        });
+        doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 6;
+        doc.text(`Subtotal:   S/.${subtotal.toFixed(2)}`, 120, y); y += 5;
+        doc.text(`IGV (18%):   S/.${igv.toFixed(2)}`, 120, y); y += 5;
+        doc.setFont(undefined, 'bold');
+        doc.text(`TOTAL:    S/.${total.toFixed(2)}`, 120, y); y += 7;
+        doc.setFont(undefined, 'normal');
+        doc.text('Método de Pago: Transferencia vía Yape', 15, y); y += 5;
+        doc.text(`Código de Pedido: ${codigoBoleta}`, 15, y); y += 7;
+        doc.setFontSize(11);
+        doc.text('**Gracias por su compra. Será confirmada en breve por el equipo.**', 15, y);
+
+        // Descargar PDF localmente
+        doc.save(`boleta-${codigoBoleta}.pdf`);
+    } catch (error) {
+        alert("Error: " + error.message);
+    }
+};
 
   return (
     <div className="page-container-for-fixed-nav">

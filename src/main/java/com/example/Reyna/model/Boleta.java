@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -15,84 +14,44 @@ public class Boleta {
     @Column(name = "id_venta")
     private Long id;
 
-    @Lob
-    @Column(name = "pdf_boleta")
-    private byte[] pdf;
-
-    @Column(name = "fecha_venta", nullable = false, updatable = false)
-    private LocalDateTime fechaVenta;
+    @Column(name = "id_vendedor")
+    private Long idVendedor;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
     private User cliente;
 
-    @OneToMany
-    @JoinColumn(name = "id_producto")
-    private List<Producto> productos;
-
-    @Column(name = "codigo", nullable = false, unique = true)
-    private String codigo;
-
-    @Column(name = "subtotal", nullable = false)
-    private double subtotal;
-
-    @Column(name = "igv", nullable = false)
-    private double igv;
+    @Column(name = "fecha_venta", nullable = false, updatable = false)
+    private LocalDateTime fechaVenta;
 
     @Column(name = "total", nullable = false)
     private double total;
 
+    @Column(name = "tipo_comprobante")
+    private String tipoComprobante;
+
+    // Campos adicionales para la boleta que no están en el esquema original
+    @Column(name = "codigo", unique = true)
+    private String codigo;
+
+    @Column(name = "subtotal")
+    private double subtotal;
+
+    @Column(name = "igv")
+    private double igv;
+
     @PrePersist
     protected void onCreate() {
         this.fechaVenta = LocalDateTime.now();
+        // Tipo de comprobante por defecto
+        if (this.tipoComprobante == null) {
+            this.tipoComprobante = "BOLETA";
+        }
     }
 
-    // Getters y setters
-    public User getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(User cliente) {
-        this.cliente = cliente;
-    }
-
-    public List<Producto> getProductos() {
-        return productos;
-    }
-
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public double getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(double subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public double getIgv() {
-        return igv;
-    }
-
-    public void setIgv(double igv) {
-        this.igv = igv;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
+    // Método auxiliar para calcular subtotal e IGV
+    public void calcularTotales() {
+        this.subtotal = this.total / 1.18; // Asumiendo IGV del 18%
+        this.igv = this.total - this.subtotal;
     }
 }

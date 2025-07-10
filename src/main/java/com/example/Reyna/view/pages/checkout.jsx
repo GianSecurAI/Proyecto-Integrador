@@ -180,7 +180,7 @@ const CheckoutPage = () => {
 
     // Construir el array de productos para el backend
     const productos = cartItems.map(item => ({
-      id_producto: item.id, // asegúrate que el objeto tenga el id correcto
+      id_producto: item.id_producto, // Usar id_producto en lugar de id
       cantidad: item.quantity,
       precioUnitario: item.price,
       subtotal: item.price * item.quantity

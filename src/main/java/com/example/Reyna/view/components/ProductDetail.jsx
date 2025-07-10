@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import '../styles/ProductDetail.css'; 
 
-const ProductDetail = ({ image, title, volume, price, description, ingredients }) => {
+const ProductDetail = ({ image, title, volume, price, description, ingredients, id_producto }) => {
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
 
@@ -17,6 +17,7 @@ const ProductDetail = ({ image, title, volume, price, description, ingredients }
     
     // Crear el objeto de producto para el carrito
     const productToAdd = {
+      id_producto: id_producto, // Agregar el ID del producto
       image,
       name: title,
       volume,
@@ -30,7 +31,7 @@ const ProductDetail = ({ image, title, volume, price, description, ingredients }
     
     // Verificar si el producto ya está en el carrito
     const existingProductIndex = currentCart.findIndex(
-      item => item.name === title && item.volume === volume
+      item => item.id_producto === id_producto
     );
     
     if (existingProductIndex !== -1) {
@@ -134,6 +135,7 @@ const ProductDetail = ({ image, title, volume, price, description, ingredients }
 };
 
 ProductDetail.propTypes = {
+  id_producto: PropTypes.number.isRequired,
   image: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   volume: PropTypes.string.isRequired,

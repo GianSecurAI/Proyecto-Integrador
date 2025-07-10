@@ -94,6 +94,7 @@ const ProductoPage = () => {
 
   // Adaptar los datos de la API al formato que espera ProductDetail
   const productDetailProps = {
+    id_producto: apiProduct.id_producto,
     image: productImages[apiProduct.codigo] || prodFrag5Img, // Imagen por defecto
     title: apiProduct.nombre_producto,
     volume: apiProduct.contenido,
