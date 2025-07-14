@@ -15,7 +15,7 @@ public class AdminInitializer {
     @Bean
     public CommandLineRunner initAdmin(UserRepository userRepository, RolRepository rolRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            String adminEmail = "admin@gmail.com";
+            String adminEmail = "torres123621@gmail.com";
             if (userRepository.findByCorreo(adminEmail).isEmpty()) {
                 // Busca el rol ADMINISTRADOR en la base de datos
                  Rol adminRol = rolRepository.findById(1L) // Asumiendo que el ID del rol ADMINISTRADOR es 1
