@@ -46,12 +46,18 @@ const ConfirmacionPagoPage = () => {
     const igv = subtotal * 0.18;
     const total = subtotal + igv;
 
-    // Preparar datos para el backend
-    const productosIds = productos.map(p => p.id_producto || p.id);
+    // Preparar datos para el backend - repetir IDs según la cantidad
+    const productosIds = [];
+    productos.forEach(p => {
+        const id = p.id_producto || p.id;
+        for (let i = 0; i < p.quantity; i++) {
+            productosIds.push(id);
+        }
+    });
 
     // Debug: Verificar los datos antes de enviar
     console.log('Cliente ID:', clienteId);
-    console.log('Productos IDs:', productosIds);
+    console.log('Productos IDs (con repeticiones por cantidad):', productosIds);
     console.log('Cliente completo:', cliente);
     console.log('Productos completos:', productos);
 

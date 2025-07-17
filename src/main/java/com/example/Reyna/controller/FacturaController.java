@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
@@ -82,13 +86,21 @@ public class FacturaController {
             User cliente = clienteOptional.get();
 
             // Obtener detalles de los productos
-            List<Producto> productos = productoRepository.findAllById(productosIds);
+            // Contar la cantidad de cada producto (para manejar múltiples unidades del mismo producto)
+            Map<Long, Long> conteoProductos = productosIds.stream()
+                .collect(Collectors.groupingBy(id -> id, Collectors.counting()));
+            
+            // Obtener productos únicos
+            Set<Long> productosUnicos = new HashSet<>(productosIds);
+            List<Producto> productos = productoRepository.findAllById(productosUnicos);
             if (productos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Productos no encontrados");
             }
 
-            // Calcular total basado en los productos
-            double total = productos.stream().mapToDouble(Producto::getPrecio).sum();
+            // Calcular total basado en los productos y sus cantidades
+            double total = productos.stream()
+                .mapToDouble(producto -> producto.getPrecio() * conteoProductos.get(producto.getId_producto()))
+                .sum();
 
             // Generar un código único para la factura
             String codigoFactura = "FAC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -142,8 +154,16 @@ public class FacturaController {
 
             // Obtener detalles de los productos
             logger.info("Buscando productos con IDs: {}", productosIds);
-            List<Producto> productos = productoRepository.findAllById(productosIds);
-            logger.info("Productos encontrados: {} de {} solicitados", productos.size(), productosIds.size());
+            
+            // Contar la cantidad de cada producto (para manejar múltiples unidades del mismo producto)
+            Map<Long, Long> conteoProductos = productosIds.stream()
+                .collect(Collectors.groupingBy(id -> id, Collectors.counting()));
+            logger.info("Conteo de productos: {}", conteoProductos);
+            
+            // Obtener productos únicos
+            Set<Long> productosUnicos = new HashSet<>(productosIds);
+            List<Producto> productos = productoRepository.findAllById(productosUnicos);
+            logger.info("Productos únicos encontrados: {} de {} solicitados", productos.size(), productosUnicos.size());
             
             if (productos.isEmpty()) {
                 logger.error("Productos no encontrados para IDs: {}", productosIds);
@@ -157,8 +177,10 @@ public class FacturaController {
             productos.forEach(p -> logger.info("Producto encontrado: ID={}, Nombre={}, Precio={}", 
                 p.getId_producto(), p.getNombre_producto(), p.getPrecio()));
 
-            // Calcular total basado en los productos
-            double total = productos.stream().mapToDouble(Producto::getPrecio).sum();
+            // Calcular total basado en los productos y sus cantidades
+            double total = productos.stream()
+                .mapToDouble(producto -> producto.getPrecio() * conteoProductos.get(producto.getId_producto()))
+                .sum();
             logger.info("Total calculado: {}", total);
 
             // Generar un código único para la factura
@@ -181,18 +203,19 @@ public class FacturaController {
             factura = facturaRepository.save(factura);
             logger.info("Factura guardada exitosamente con ID: {}", factura.getId());
 
-            // Crear y guardar los detalles de factura
+            // Crear y guardar los detalles de factura con las cantidades correctas
             for (Producto producto : productos) {
+                Long cantidad = conteoProductos.get(producto.getId_producto());
                 DetalleFactura detalle = new DetalleFactura();
                 detalle.setFactura(factura);
                 detalle.setProducto(producto);
-                detalle.setCantidad(1); // Por ahora asumimos cantidad 1, se puede mejorar después
+                detalle.setCantidad(cantidad.intValue()); // Usar la cantidad real
                 detalle.setPrecioUnitario(BigDecimal.valueOf(producto.getPrecio()));
-                detalle.setSubtotal(BigDecimal.valueOf(producto.getPrecio()));
+                detalle.setSubtotal(BigDecimal.valueOf(producto.getPrecio() * cantidad));
                 
                 detalleFacturaRepository.save(detalle);
-                logger.info("Detalle de factura guardado: Producto ID={}, Cantidad={}, Precio={}", 
-                    producto.getId_producto(), detalle.getCantidad(), detalle.getPrecioUnitario());
+                logger.info("Detalle de factura guardado: Producto ID={}, Cantidad={}, Precio={}, Subtotal={}", 
+                    producto.getId_producto(), detalle.getCantidad(), detalle.getPrecioUnitario(), detalle.getSubtotal());
             }
 
             String codigoCompleto = "Factura guardada exitosamente con código: " + codigoFactura;
