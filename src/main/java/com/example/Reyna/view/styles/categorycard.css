@@ -1,7 +1,164 @@
 .category-card-title {
   color: #fff;
-  font-size: 2rem;
-  letter-spacing: 2px;
+  font-size: 1rem; /* Tamaño base para móviles pequeños */
   font-weight: 400;
   text-shadow: 0 2px 8px #0007;
+  transform: translateY(10px);
+  opacity: 0.9;
+  transition: all 0.3s ease-in-out;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  text-align: center;
+  padding: 0 10px; /* Padding para evitar que se corte en pantallas pequeñas */
 }
+
+/* Responsivo para diferentes tamaños de pantalla */
+@media (min-width: 576px) {
+  .category-card-title {
+    font-size: 1.2rem; /* Teléfonos grandes */
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (min-width: 1040px) {
+  .category-card-title {
+    font-size: 1.4rem; /* Tablets */
+    letter-spacing: 1.6px;
+  }
+}
+
+@media (min-width: 1150px) {
+  .category-card-title {
+    font-size: 1.6rem; /* Laptops */
+    letter-spacing: 1.8px;
+  }
+}
+
+
+
+/* Contenedor de la tarjeta con animaciones */
+.card {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateY(0);
+  cursor: pointer;
+}
+
+/* Imagen de la tarjeta */
+.card .card-img {
+  transition: transform 0.4s ease-in-out;
+  transform: scale(1);
+  will-change: transform;
+}
+
+/* Overlay con gradiente animado */
+.card .card-img-overlay {
+  background: linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(151, 8, 44, 0.2) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  transition: background 0.3s ease-in-out;
+  will-change: background;
+}
+
+/* Efectos hover */
+.card:hover {
+  transform: translateY(-4px); /* Menos elevación en móviles */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 
+              0 5px 15px rgba(151, 8, 44, 0.1);
+}
+
+/* Efectos hover más pronunciados en pantallas grandes */
+@media (min-width: 768px) {
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 
+                0 8px 18px rgba(151, 8, 44, 0.1);
+  }
+}
+
+@media (min-width: 1200px) {
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 
+                0 10px 20px rgba(151, 8, 44, 0.1);
+  }
+}
+
+.card:hover .card-img {
+  transform: scale(1.05);
+}
+
+.card:hover .card-img-overlay {
+  background: linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(151, 8, 44, 0.3) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+.card:hover .category-card-title {
+  transform: translateY(0);
+  opacity: 1;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Efectos hover responsivos para el letter-spacing */
+@media (min-width: 576px) {
+  .card:hover .category-card-title {
+    letter-spacing: 2px;
+  }
+}
+
+@media (min-width: 768px) {
+  .card:hover .category-card-title {
+    letter-spacing: 2.5px;
+  }
+}
+
+@media (min-width: 992px) {
+  .card:hover .category-card-title {
+    letter-spacing: 3px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .card:hover .category-card-title {
+    letter-spacing: 3.5px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .card:hover .category-card-title {
+    letter-spacing: 4px;
+  }
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Efecto de pulso sutil */
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 8px 35px rgba(151, 8, 44, 0.15);
+  }
+}
+
