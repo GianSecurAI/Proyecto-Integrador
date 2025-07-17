@@ -10,7 +10,7 @@ const PagoYapePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   // Recibe datos del pedido y usuario desde el checkout
-  const { total = 0, userData = {}, cartItems = [] } = location.state || {};
+  const { total = 0, userData = {}, cartItems = [], deliveryMethod = 'tienda', deliveryFee = 0 } = location.state || {};
 
   const [comprobante, setComprobante] = useState(null);
   const [tipoComprobante, setTipoComprobante] = useState('boleta');
@@ -38,7 +38,7 @@ const PagoYapePage = () => {
     }
     setError('');
     // Aquí podrías guardar el comprobante en backend si lo deseas
-    navigate('/confirmacion', { state: { total, tipoComprobante, ruc, cliente: userData, productos: cartItems } });
+    navigate('/confirmacion', { state: { total, tipoComprobante, ruc, cliente: userData, productos: cartItems, deliveryMethod, deliveryFee } });
   };
 
   return (

@@ -16,6 +16,8 @@ const CheckoutPage = () => {
   const [showTerms, setShowTerms] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('tienda');
+  const [deliveryMethod, setDeliveryMethod] = useState('tienda'); // Nuevo estado para método de entrega
+  const [deliveryFee, setDeliveryFee] = useState(0); // Cargo por delivery
   const [successModal, setSuccessModal] = useState(false);
   const [loading, setLoading] = useState(true); // Estado para la carga de datos
   
@@ -95,7 +97,20 @@ const CheckoutPage = () => {
     const cartSubtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setSubtotal(cartSubtotal);
     // Aplicar descuento si existe (en este ejemplo el descuento es 0)
-    setTotal(cartSubtotal - discount);
+    const finalTotal = cartSubtotal - discount + deliveryFee;
+    setTotal(finalTotal);
+  };
+
+  // Función para manejar el cambio de método de entrega
+  const handleDeliveryMethodChange = (method) => {
+    setDeliveryMethod(method);
+    const newDeliveryFee = method === 'delivery' ? 20 : 0;
+    setDeliveryFee(newDeliveryFee);
+    
+    // Recalcular totales con el nuevo cargo de delivery
+    const cartSubtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const finalTotal = cartSubtotal - discount + newDeliveryFee;
+    setTotal(finalTotal);
   };
 
   // Función para formatear precios a formato peruano (S/ XX.XX)
@@ -358,37 +373,44 @@ const CheckoutPage = () => {
                 </div>
               )}
               
+              {deliveryFee > 0 && (
+                <div className="summary-item">
+                  <span>Cargo por delivery:</span>
+                  <span>+{formatPrice(deliveryFee)}</span>
+                </div>
+              )}
+              
               <div className="summary-item summary-total">
                 <span>Total:</span>
                 <span>{formatPrice(total)}</span>
               </div>
               
-              {/* Opciones de pago */}
+              {/* Opciones de entrega */}
               <div className="payment-options">
-                <h5>Método de pago:</h5>
+                <h5>Método de entrega:</h5>
                 
                 <div className="payment-option">
                   <input 
                     type="radio" 
                     id="tienda" 
-                    name="paymentMethod" 
+                    name="deliveryMethod" 
                     value="tienda" 
-                    checked={paymentMethod === 'tienda'} 
-                    onChange={() => setPaymentMethod('tienda')} 
+                    checked={deliveryMethod === 'tienda'} 
+                    onChange={() => handleDeliveryMethodChange('tienda')} 
                   />
-                  <label htmlFor="tienda">Pago en tienda</label>
+                  <label htmlFor="tienda">Recojo en tienda</label>
                 </div>
                 
                 <div className="payment-option">
                   <input 
                     type="radio" 
-                    id="contraentrega" 
-                    name="paymentMethod" 
-                    value="contraentrega" 
-                    checked={paymentMethod === 'contraentrega'} 
-                    onChange={() => setPaymentMethod('contraentrega')} 
+                    id="delivery" 
+                    name="deliveryMethod" 
+                    value="delivery" 
+                    checked={deliveryMethod === 'delivery'} 
+                    onChange={() => handleDeliveryMethodChange('delivery')} 
                   />
-                  <label htmlFor="contraentrega">Pago contraentrega</label>
+                  <label htmlFor="delivery">Delivery (+S/ 20.00)</label>
                 </div>
               </div>
             </div>
@@ -411,7 +433,7 @@ const CheckoutPage = () => {
             <button 
               className="submit-order-btn" 
               disabled={!termsAccepted}
-              onClick={() => navigate('/pago', { state: { total, userData, cartItems } })}
+              onClick={() => navigate('/pago', { state: { total, userData, cartItems, deliveryMethod, deliveryFee } })}
             >
               Continuar con el pago
             </button>

@@ -9,7 +9,10 @@ import { jsPDF } from 'jspdf';
 const ConfirmacionPagoPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { total = 0, tipoComprobante = 'boleta', ruc = '' } = location.state || {};
+  const { total = 0, tipoComprobante = 'boleta', ruc = '', deliveryMethod = 'tienda', deliveryFee = 0 } = location.state || {};
+
+  // Debug: Verificar que los datos de entrega están llegando correctamente
+  console.log('Datos de entrega recibidos en confirmación:', { deliveryMethod, deliveryFee });
 
   const handleDownloadPDF = async () => {
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -42,7 +45,9 @@ const ConfirmacionPagoPage = () => {
     clienteId = parseInt(clienteId, 10);
 
     // Calcular totales
-    const subtotal = productos.reduce((sum, p) => sum + (p.price * p.quantity), 0) / 1.18;
+    const productosTotal = productos.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+    const totalConDelivery = productosTotal + deliveryFee;
+    const subtotal = totalConDelivery / 1.18;
     const igv = subtotal * 0.18;
     const total = subtotal + igv;
 
@@ -60,14 +65,16 @@ const ConfirmacionPagoPage = () => {
     console.log('Productos IDs (con repeticiones por cantidad):', productosIds);
     console.log('Cliente completo:', cliente);
     console.log('Productos completos:', productos);
+    console.log('Método de entrega a enviar:', deliveryMethod);
+    console.log('Cargo de delivery a enviar:', deliveryFee);
 
     try {
         let response, codigoComprobante;
         
         // Determinar si es boleta o factura y hacer la solicitud correspondiente
         if (tipoComprobante === 'factura') {
-            // Para facturas, necesitamos enviar también el RUC
-            response = await fetch(`/api/facturas/guardar?clienteId=${clienteId}&rucCliente=${ruc}`, {
+            // Para facturas, necesitamos enviar también el RUC y método de entrega
+            response = await fetch(`/api/facturas/guardar?clienteId=${clienteId}&rucCliente=${ruc}&metodoEntrega=${deliveryMethod}`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -76,8 +83,8 @@ const ConfirmacionPagoPage = () => {
                 body: JSON.stringify(productosIds)
             });
         } else {
-            // Para boletas (comportamiento original)
-            response = await fetch(`/api/boletas/guardar?clienteId=${clienteId}`, {
+            // Para boletas, incluir método de entrega
+            response = await fetch(`/api/boletas/guardar?clienteId=${clienteId}&metodoEntrega=${deliveryMethod}`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -129,12 +136,27 @@ const ConfirmacionPagoPage = () => {
             doc.text(`|  ${p.quantity}   | ${p.name.slice(0,22)} | S/.${p.price} | S/.${(p.price * p.quantity).toFixed(2)} |`, 15, y);
             y += 5;
         });
+        
+        // Agregar cargo de delivery si existe
+        if (deliveryFee > 0) {
+            doc.text(`|  1   | Cargo por delivery             | S/.${deliveryFee.toFixed(2)} | S/.${deliveryFee.toFixed(2)} |`, 15, y);
+            y += 5;
+        }
+        
         doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 6;
-        doc.text(`Subtotal:   S/.${subtotal.toFixed(2)}`, 120, y); y += 5;
-        doc.text(`IGV (18%):   S/.${igv.toFixed(2)}`, 120, y); y += 5;
+        
+        // Calcular totales correctamente incluyendo el delivery
+        const totalProductosConDelivery = productosTotal + deliveryFee;
+        const subtotalFinal = totalProductosConDelivery / 1.18;
+        const igvFinal = subtotalFinal * 0.18;
+        const totalFinal = subtotalFinal + igvFinal;
+        
+        doc.text(`Subtotal:   S/.${subtotalFinal.toFixed(2)}`, 120, y); y += 5;
+        doc.text(`IGV (18%):   S/.${igvFinal.toFixed(2)}`, 120, y); y += 5;
         doc.setFont(undefined, 'bold');
-        doc.text(`TOTAL:    S/.${total.toFixed(2)}`, 120, y); y += 7;
+        doc.text(`TOTAL:    S/.${totalFinal.toFixed(2)}`, 120, y); y += 7;
         doc.setFont(undefined, 'normal');
+        doc.text(`Método de entrega: ${deliveryMethod === 'delivery' ? 'Delivery' : 'Recojo en tienda'}`, 15, y); y += 5;
         doc.text('Método de Pago: Transferencia vía Yape', 15, y); y += 5;
         doc.text(`Código de ${tipoComprobante === 'factura' ? 'Factura' : 'Pedido'}: ${codigoComprobante}`, 15, y); y += 7;
         doc.setFontSize(11);

@@ -123,7 +123,10 @@ public class FacturaController {
 
     // Guardar la información de la compra como factura
     @PostMapping("/guardar")
-    public ResponseEntity<String> guardarFactura(@RequestParam Long clienteId, @RequestParam String rucCliente, @RequestBody List<Long> productosIds) {
+    public ResponseEntity<String> guardarFactura(@RequestParam Long clienteId, 
+                                                @RequestParam String rucCliente,
+                                                @RequestParam(required = false, defaultValue = "tienda") String metodoEntrega,
+                                                @RequestBody List<Long> productosIds) {
         try {
             logger.info("Iniciando guardado de factura para cliente ID: {} con RUC: {} y productos: {}", clienteId, rucCliente, productosIds);
             
@@ -178,10 +181,16 @@ public class FacturaController {
                 p.getId_producto(), p.getNombre_producto(), p.getPrecio()));
 
             // Calcular total basado en los productos y sus cantidades
-            double total = productos.stream()
+            double totalProductos = productos.stream()
                 .mapToDouble(producto -> producto.getPrecio() * conteoProductos.get(producto.getId_producto()))
                 .sum();
-            logger.info("Total calculado: {}", total);
+            
+            // Determinar cargo de delivery basado en el método de entrega
+            double cargoDelivery = "delivery".equals(metodoEntrega) ? 20.0 : 0.0;
+            
+            // Agregar cargo de delivery si corresponde
+            double total = totalProductos + cargoDelivery;
+            logger.info("Total productos: {}, Cargo delivery: {}, Total final: {}", totalProductos, cargoDelivery, total);
 
             // Generar un código único para la factura
             String codigoFactura = "FAC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -193,6 +202,8 @@ public class FacturaController {
             factura.setCliente(cliente);
             factura.setRucCliente(rucCliente);
             factura.setIdVendedor(vendedorPorDefecto.getId_usuario()); // Asignar vendedor explícitamente
+            factura.setMetodoEntrega(metodoEntrega);
+            factura.setCargoDelivery(cargoDelivery);
             factura.setTotal(total);
             factura.calcularTotales(); // Calcula subtotal e IGV automáticamente
             

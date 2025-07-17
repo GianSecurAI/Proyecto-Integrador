@@ -86,12 +86,19 @@ const BoletasAdmin = () => {
       y += 5;
     }
     
+    // Agregar cargo de delivery si existe
+    if (boleta.cargoDelivery && boleta.cargoDelivery > 0) {
+      doc.text(`|  1   | Cargo por delivery             | S/.${boleta.cargoDelivery.toFixed(2)} | S/.${boleta.cargoDelivery.toFixed(2)} |`, 15, y);
+      y += 5;
+    }
+    
     doc.text('------------------------------------------------------------------------------------------------------------------------', 15, y); y += 6;
     doc.text(`Subtotal:   S/.${boleta.subtotal?.toFixed(2)}`, 120, y); y += 5;
     doc.text(`IGV (18%):   S/.${boleta.igv?.toFixed(2)}`, 120, y); y += 5;
     doc.setFont(undefined, 'bold');
     doc.text(`TOTAL:    S/.${boleta.total?.toFixed(2)}`, 120, y); y += 7;
     doc.setFont(undefined, 'normal');
+    doc.text(`Método de entrega: ${boleta.metodoEntrega === 'delivery' ? 'Delivery' : 'Recojo en tienda'}`, 15, y); y += 5;
     doc.text('Método de Pago: Transferencia vía Yape', 15, y); y += 5;
     doc.text(`Código de Pedido: ${boleta.codigo}`, 15, y); y += 7;
     doc.setFontSize(11);
@@ -172,6 +179,14 @@ const BoletasAdmin = () => {
                         <td style={{ textAlign: 'right', padding: '2px' }}>S/.{det.subtotal?.toFixed(2)}</td>
                       </tr>
                     ))}
+                    {boleta.cargoDelivery && boleta.cargoDelivery > 0 && (
+                      <tr>
+                        <td style={{ padding: '2px' }}>1</td>
+                        <td style={{ padding: '2px' }}>Cargo por delivery</td>
+                        <td style={{ textAlign: 'right', padding: '2px' }}>S/.{boleta.cargoDelivery.toFixed(2)}</td>
+                        <td style={{ textAlign: 'right', padding: '2px' }}>S/.{boleta.cargoDelivery.toFixed(2)}</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
                 
@@ -187,6 +202,7 @@ const BoletasAdmin = () => {
                   </div>
                 </div>
                 
+                <div style={{ marginBottom: 5 }}>Método de entrega: {boleta.metodoEntrega === 'delivery' ? 'Delivery' : 'Recojo en tienda'}</div>
                 <div style={{ marginBottom: 5 }}>Método de Pago: Transferencia vía Yape</div>
                 <div style={{ marginBottom: 10 }}>Código de Pedido: {boleta.codigo}</div>
                 

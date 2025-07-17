@@ -125,7 +125,9 @@ public class BoletaController {
 
     // Guardar la información de la compra como boleta
     @PostMapping("/guardar")
-    public ResponseEntity<String> guardarBoleta(@RequestParam Long clienteId, @RequestBody List<Long> productosIds) {
+    public ResponseEntity<String> guardarBoleta(@RequestParam Long clienteId, 
+                                               @RequestParam(required = false, defaultValue = "tienda") String metodoEntrega,
+                                               @RequestBody List<Long> productosIds) {
         try {
             logger.info("Iniciando guardado de boleta para cliente ID: {} con productos: {}", clienteId, productosIds);
             
@@ -180,10 +182,16 @@ public class BoletaController {
                 p.getId_producto(), p.getNombre_producto(), p.getPrecio()));
 
             // Calcular total basado en los productos y sus cantidades
-            double total = productos.stream()
+            double totalProductos = productos.stream()
                 .mapToDouble(producto -> producto.getPrecio() * conteoProductos.get(producto.getId_producto()))
                 .sum();
-            logger.info("Total calculado: {}", total);
+            
+            // Determinar cargo de delivery basado en el método de entrega
+            double cargoDelivery = "delivery".equals(metodoEntrega) ? 20.0 : 0.0;
+            
+            // Agregar cargo de delivery si corresponde
+            double total = totalProductos + cargoDelivery;
+            logger.info("Total productos: {}, Cargo delivery: {}, Total final: {}", totalProductos, cargoDelivery, total);
 
             // Generar un código único para la boleta
             String codigoBoleta = "BOL-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -194,11 +202,18 @@ public class BoletaController {
             boleta.setCodigo(codigoBoleta);
             boleta.setCliente(cliente);
             boleta.setIdVendedor(vendedorPorDefecto.getId_usuario()); // Asignar vendedor explícitamente
+            boleta.setMetodoEntrega(metodoEntrega);
+            boleta.setCargoDelivery(cargoDelivery);
             boleta.setTotal(total);
+            
+            logger.info("Valores asignados antes de calcularTotales - Método: {}, Cargo: {}, Total: {}", 
+                boleta.getMetodoEntrega(), boleta.getCargoDelivery(), boleta.getTotal());
+            
             boleta.calcularTotales(); // Calcula subtotal e IGV automáticamente
             
-            logger.info("Antes de guardar - Cliente ID: {}, Vendedor ID: {}, Total: {}, Subtotal: {}, IGV: {}", 
+            logger.info("Antes de guardar - Cliente ID: {}, Vendedor ID: {}, Método: {}, Cargo: {}, Total: {}, Subtotal: {}, IGV: {}", 
                 boleta.getCliente().getId_usuario(), boleta.getIdVendedor(), 
+                boleta.getMetodoEntrega(), boleta.getCargoDelivery(),
                 boleta.getTotal(), boleta.getSubtotal(), boleta.getIgv());
             
             boleta = boletaRepository.save(boleta);

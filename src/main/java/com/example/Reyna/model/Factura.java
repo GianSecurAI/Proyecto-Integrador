@@ -47,6 +47,12 @@ public class Factura {
     @Column(name = "igv")
     private double igv;
 
+    @Column(name = "metodo_entrega")
+    private String metodoEntrega; // "tienda" o "delivery"
+
+    @Column(name = "cargo_delivery")
+    private double cargoDelivery; // Cargo adicional por delivery
+
     // Relación con DetalleFactura - Un registro de factura puede tener múltiples detalles
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
@@ -65,5 +71,22 @@ public class Factura {
     public void calcularTotales() {
         this.subtotal = this.total / 1.18; // Asumiendo IGV del 18%
         this.igv = this.total - this.subtotal;
+    }
+
+    // Getters y Setters para los nuevos campos
+    public String getMetodoEntrega() {
+        return metodoEntrega;
+    }
+
+    public void setMetodoEntrega(String metodoEntrega) {
+        this.metodoEntrega = metodoEntrega;
+    }
+
+    public double getCargoDelivery() {
+        return cargoDelivery;
+    }
+
+    public void setCargoDelivery(double cargoDelivery) {
+        this.cargoDelivery = cargoDelivery;
     }
 }
