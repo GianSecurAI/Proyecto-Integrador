@@ -24,6 +24,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authProvider;
+    private final MaintenanceModeFilter maintenanceModeFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,6 +38,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/productos/**", "/api/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                        //Permitir acceso a endpoints de Actuator
+                        .requestMatchers("/actuator/**").permitAll()
                         // Endpoints solo para ADMINISTRADOR
                         .requestMatchers(HttpMethod.POST, "/admin/register-usuario").hasAuthority("ADMINISTRADOR")
                         .requestMatchers("/admin/users/**").hasAuthority("ADMINISTRADOR") // Permite todas las operaciones CRUD para usuarios/clientes (incluye /admin/users/register-client si existiera)
@@ -54,6 +57,8 @@ public class SecurityConfig {
                 .sessionManagement(sessionManager -> sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // Agrega el filtro de mantenimiento antes del filtro de autenticación
+                .addFilterBefore(maintenanceModeFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
 
