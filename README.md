@@ -80,7 +80,7 @@ La entidad principal es `User` y contiene los siguientes campos:
 ## 🛠️ Configuración de Desarrollo
 
 - 🔙 Servidor backend: `http://localhost:8090`  
-- 💾 Base de datos: **MySQL en Neon Tech**
+- 💾 Base de datos: **MySQL**
 
 ---
 
