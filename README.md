@@ -1,6 +1,6 @@
 # 👑 Reyna - Aplicación Web 
 
-**Reyna** es una aplicación web que combina un frontend desarrollado con **React** y un backend robusto con **Spring Boot**. Esta solución integra autenticación de usuarios mediante **JWT (JSON Web Token)** y se conecta a una base de datos **PostgreSQL** alojada en la nube a través de **Neon Tech**.
+**Reyna** es una aplicación web que combina un frontend desarrollado con **React** y un backend robusto con **Spring Boot**. Esta solución integra autenticación de usuarios mediante **JWT (JSON Web Token)** y se conecta a una base de datos **MySQL**.
 
 ---
 
@@ -61,7 +61,7 @@ La entidad principal es `User` y contiene los siguientes campos:
 - 🛡️ Spring Security  
 - 🗃️ Spring Data JPA  
 - 🔐 JWT (JSON Web Token)  
-- 🐘 PostgreSQL 42.7.3  
+- 🐘 MySQL Workbench 8.0 CE  
 
 ### 🎨 Frontend
 
@@ -73,14 +73,14 @@ La entidad principal es `User` y contiene los siguientes campos:
 
 ## ☁️ Infraestructura
 
-- 🐘 Base de datos **PostgreSQL** alojada en **Neon Tech**
+- 🐘 Base de datos **MySQL**
 
 ---
 
 ## 🛠️ Configuración de Desarrollo
 
 - 🔙 Servidor backend: `http://localhost:8090`  
-- 💾 Base de datos: **PostgreSQL en Neon Tech**
+- 💾 Base de datos: **MySQL en Neon Tech**
 
 ---
 
